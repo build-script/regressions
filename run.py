@@ -25,10 +25,10 @@ SCENARIOS = ROOT / "scenarios"
 
 SYSTEM = {"darwin": "macos", "linux": "linux", "win32": "windows"}[sys.platform]
 
-# a JVM program that starts with these did not link
+# a JVM program that ends with these did not link, the names alone may be in its output
 LINKAGE_ERRORS = re.compile(
-    r"NoSuchMethodError|NoClassDefFoundError|ClassNotFoundException|LinkageError|UnsatisfiedLinkError|"
-    r"ExceptionInInitializerError|AbstractMethodError|IncompatibleClassChangeError|Exception in thread"
+    r"Exception in thread \"|java\.lang\.(NoSuchMethodError|NoClassDefFoundError|ClassNotFoundException|LinkageError|"
+    r"UnsatisfiedLinkError|ExceptionInInitializerError|AbstractMethodError|IncompatibleClassChangeError)"
 )
 
 # a build that is up to date compiles and links nothing
