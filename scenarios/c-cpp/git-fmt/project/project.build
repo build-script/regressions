@@ -6,6 +6,8 @@ fmt = build_cpp(
     list(),
     directory = git("https://github.com/fmtlib/fmt", "407c905e45ad75fc29bf0f9bb7c5c2fd3475976f"),
     exclude = list("src/fmt.cc"),
+    // the tests of fmt need GoogleTest
+    test_sources = list(),
 )
 
 build_cpp("hello", list(fmt), program = true)
