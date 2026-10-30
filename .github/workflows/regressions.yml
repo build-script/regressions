@@ -1,0 +1,165 @@
+# The scenarios against build-script/build: on Linux all of them, on Windows the build and the tests of
+# build-script itself, macOS only when asked for, its minutes count ten times.
+name: regressions
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit, branch or tag of build-script/build
+        default: main
+      kinds:
+        description: Kinds of scenarios, c-cpp jvm android
+        default: c-cpp jvm android
+      scenarios:
+        description: Names of scenarios, all of the kinds without
+        default: ""
+      macos:
+        description: Also on macOS
+        type: boolean
+        default: false
+
+concurrency:
+  group: regressions-${{ github.ref }}-${{ inputs.ref || 'main' }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  BUILD_SCRIPT_REF: ${{ inputs.ref || 'main' }}
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: build-script/build
+          ref: ${{ env.BUILD_SCRIPT_REF }}
+          path: build-script
+
+      # raylib needs the X11 headers, tablegen-colors llvm-config and llvm-tblgen
+      - name: Packages
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -q -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev llvm-dev
+          echo "$(llvm-config --bindir)" >> "$GITHUB_PATH"
+
+      - uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            build-script/target
+            .home
+            .sources
+          key: linux-${{ github.run_id }}
+          restore-keys: linux-
+
+      # the licenses the image of the runner accepted, for the packages build-script installs itself
+      - name: Android licenses
+        run: mkdir -p .home/android-sdk/licenses && cp "$ANDROID_HOME"/licenses/* .home/android-sdk/licenses/
+
+      - name: build-script
+        working-directory: build-script
+        run: |
+          rustup update stable --no-self-update
+          cargo build --release
+          cargo test --release
+
+      - name: Scenarios
+        run: python3 run.py --build build-script/target/release/build-script --kind ${{ inputs.kinds || 'c-cpp jvm android' }} ${{ inputs.scenarios }}
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: logs-linux
+          path: .logs
+
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: |
+            ~/.cargo/registry
+            build-script/target
+            .home
+            .sources
+          key: linux-${{ github.run_id }}
+
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: build-script/build
+          ref: ${{ env.BUILD_SCRIPT_REF }}
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            target
+          key: windows-${{ hashFiles('Cargo.lock') }}-${{ github.run_id }}
+          restore-keys: windows-${{ hashFiles('Cargo.lock') }}-
+
+      - name: build-script
+        run: |
+          rustup update stable --no-self-update
+          cargo build --release
+          cargo test --release
+
+  macos:
+    if: inputs.macos
+    runs-on: macos-15
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: build-script/build
+          ref: ${{ env.BUILD_SCRIPT_REF }}
+          path: build-script
+
+      - name: Packages
+        run: brew install llvm
+
+      - uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            build-script/target
+            .home
+            .sources
+          key: macos-${{ github.run_id }}
+          restore-keys: macos-
+
+      - name: build-script
+        working-directory: build-script
+        run: |
+          rustup update stable --no-self-update
+          cargo build --release
+          cargo test --release
+
+      - name: Scenarios
+        run: python3 run.py --build build-script/target/release/build-script --kind ${{ inputs.kinds }} ${{ inputs.scenarios }}
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: logs-macos
+          path: .logs
+
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: |
+            ~/.cargo/registry
+            build-script/target
+            .home
+            .sources
+          key: macos-${{ github.run_id }}
