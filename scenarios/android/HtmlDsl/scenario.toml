@@ -1,0 +1,5 @@
+# a Kotlin library with an Android sample
+steps = [
+    "build",
+    "build again",
+]

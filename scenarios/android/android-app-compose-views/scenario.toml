@@ -1,0 +1,5 @@
+# Compose and views
+steps = [
+    "build",
+    "build again",
+]

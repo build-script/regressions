@@ -1,0 +1,36 @@
+use kotlin
+
+version = "0.2.12"
+
+jar = build_kotlin(
+    "parnas",
+    list(
+        platform("com.fasterxml.jackson:jackson-bom:2.21.2"),
+        "org.linguafranca.pwdb:KeePassJava2-jackson:2.2.4",
+        "software.amazon.awssdk:ssm:2.42.37",
+        "software.amazon.awssdk:sts:2.42.37",
+        "software.amazon.awssdk:signin:2.42.37",
+        "com.electronwill.night-config:toml:3.8.4",
+        "com.electronwill.night-config:core:3.8.4",
+        "com.github.ajalt.clikt:clikt:3.5.4",
+        "com.github.ajalt:mordant:1.2.1",
+        "org.apache.logging.log4j:log4j-core:2.25.4",
+        "org.apache.logging.log4j:log4j-slf4j2-impl:2.25.4",
+    ),
+    list(maven_central()),
+    main_class = "sndl.parnas.MainKt",
+    kotlin_version = "2.3.20",
+    kotlin_args = list("-Xjdk-release=25"),
+    jdk = jdk("25", distribution = "corretto"),
+    // like the copySkill task and the version.txt the shadowJar task writes
+    resource_files = list("skill.md=.claude/skills/parnas/SKILL.md"),
+    resource_texts = list("version.txt=" + version),
+    // the SSM tests start LocalStack with Testcontainers, they need Docker
+    test_dependencies = list(
+        "org.junit.jupiter:junit-jupiter-api:5.14.3",
+        "org.junit.jupiter:junit-jupiter-engine:5.14.3",
+        "org.junit.platform:junit-platform-launcher:1.14.3",
+        "org.testcontainers:testcontainers:1.21.4",
+        "org.testcontainers:localstack:1.21.4",
+    ),
+)

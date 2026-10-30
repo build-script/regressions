@@ -1,0 +1,54 @@
+use android
+
+repositories = list(google(), maven_central(), maven("https://jitpack.io"))
+
+imagepicker = build_android_library(
+    "imagepicker",
+    "com.esafirm.imagepicker",
+    list(
+        "com.github.bumptech.glide:glide:4.14.2",
+        "androidx.recyclerview:recyclerview:1.2.1",
+        "androidx.appcompat:appcompat:1.5.1",
+        "androidx.core:core-ktx:1.9.0",
+    ),
+    repositories,
+    min_sdk = 21,
+    plugins = list("parcelize"),
+    kotlin_version = "1.7.21",
+    view_binding = true,
+    // transitive R classes, the default of the Android Gradle plugin 7.3 of the project
+    non_transitive_r_class = false,
+    directory = "imagepicker",
+    test_dependencies = list(platform("org.junit:junit-bom:5.9.1"), "org.junit.jupiter:junit-jupiter", "com.natpryce:hamkrest:1.8.0.1"),
+)
+
+sample = build_android(
+    "sample",
+    "com.esafirm.sample",
+    list(
+        imagepicker,
+        "com.github.bumptech.glide:glide:4.14.2",
+        "androidx.appcompat:appcompat:1.5.1",
+        "androidx.core:core-ktx:1.9.0",
+        "com.squareup.leakcanary:leakcanary-android:2.9.1",
+    ),
+    repositories,
+    application_id = "com.esafirm.imagepicker.sample",
+    min_sdk = 21,
+    target_sdk = 33,
+    view_binding = true,
+    kotlin_version = "1.7.21",
+    // transitive R classes, the default of the Android Gradle plugin 7.3 of the project
+    non_transitive_r_class = false,
+    directory = "sample",
+    // build.gradle excludes Kotlin and Hamcrest from Barista, here the highest versions win
+    android_test_dependencies = list(
+        "androidx.test.espresso:espresso-core:3.5.0",
+        "androidx.test.espresso:espresso-contrib:3.5.0",
+        "androidx.test:runner:1.5.1",
+        "androidx.test:rules:1.5.0",
+        "androidx.test.ext:junit-ktx:1.1.4",
+        "androidx.test:core:1.5.0",
+        "com.adevinta.android:barista:4.2.0",
+    ),
+)

@@ -1,0 +1,11 @@
+use cpp
+
+// fmt 12.1.0, by its commit
+fmt = build_cpp(
+    "fmt",
+    list(),
+    directory = git("https://github.com/fmtlib/fmt", "407c905e45ad75fc29bf0f9bb7c5c2fd3475976f"),
+    exclude = list("src/fmt.cc"),
+)
+
+build_cpp("hello", list(fmt), program = true)

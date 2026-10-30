@@ -1,0 +1,159 @@
+#!/bin/bash
+set -e
+
+# Check if --local or -l flag is passed for building from local source
+USE_LOCAL=false
+if [ "$1" = "--local" ] || [ "$1" = "-l" ] || [ "$LOCAL" = "true" ]; then
+    USE_LOCAL=true
+fi
+
+# Fetch latest release version tag from GitHub API if not set
+if [ -z "$VERSION" ]; then
+    LATEST_TAG=$(curl -s https://api.github.com/repos/Coding-Meet/Library-Insight/releases/latest | grep '"tag_name":' | sed -E 's/.*"v?([^"]+)".*/\1/')
+    VERSION="${LATEST_TAG:-1.0.0}"
+fi
+
+INSTALL_DIR="$HOME/.library-insight"
+ZIP_NAME="library-insight-$VERSION.zip"
+RELEASE_URL="https://github.com/Coding-Meet/Library-Insight/releases/download/v$VERSION/$ZIP_NAME"
+
+echo "=================================================="
+if [ "$USE_LOCAL" = true ]; then
+    echo " Installing Library Insight from local source code..."
+else
+    echo " Installing Library Insight v$VERSION..."
+fi
+echo "=================================================="
+
+# Create install directory
+mkdir -p "$INSTALL_DIR"
+
+if [ "$USE_LOCAL" = true ]; then
+    if [ -f "./gradlew" ]; then
+        echo "Generating AI skill and compiling local source code..."
+        ./gradlew generateAgentSkill :library-insight-cli:installDist
+        cp -R library-insight-cli/build/install/library-insight/* "$INSTALL_DIR"
+        echo "Local build installed successfully!"
+    else
+        echo "ERROR: --local option passed but no local gradlew wrapper found."
+        exit 1
+    fi
+else
+    # Temporary download path
+    TEMP_ZIP="/tmp/$ZIP_NAME"
+
+    echo "Attempting to download pre-compiled release from GitHub..."
+    echo "URL: $RELEASE_URL"
+
+    # Download using curl
+    if curl -L --fail -o "$TEMP_ZIP" "$RELEASE_URL"; then
+        echo "Download successful! Extracting..."
+        unzip -o "$TEMP_ZIP" -d "$INSTALL_DIR"
+        
+        # Check if files were extracted into a subdirectory and move them up
+        if [ -d "$INSTALL_DIR/library-insight-$VERSION" ]; then
+            cp -R "$INSTALL_DIR/library-insight-$VERSION"/* "$INSTALL_DIR"
+            rm -rf "$INSTALL_DIR/library-insight-$VERSION"
+        elif [ -d "$INSTALL_DIR/library-insight-cli-$VERSION" ]; then
+            cp -R "$INSTALL_DIR/library-insight-cli-$VERSION"/* "$INSTALL_DIR"
+            rm -rf "$INSTALL_DIR/library-insight-cli-$VERSION"
+        fi
+        rm -f "$TEMP_ZIP"
+        echo "Pre-compiled release installed successfully!"
+        else
+        echo "--------------------------------------------------"
+        echo " Note: Release zip download failed."
+        echo "--------------------------------------------------"
+        if [ -f "./gradlew" ]; then
+            echo " Falling back to compiling from local source code..."
+            ./gradlew generateAgentSkill :library-insight-cli:installDist
+            cp -R library-insight-cli/build/install/library-insight/* "$INSTALL_DIR"
+        else
+            echo " ERROR: Could not download pre-compiled release and no local gradlew wrapper found."
+            exit 1
+        fi
+    fi
+fi
+
+echo "Configuring executable permissions..."
+chmod +x "$INSTALL_DIR/bin/library-insight" "$INSTALL_DIR/bin/li" 2>/dev/null || true
+
+echo "Creating global symlinks for library-insight and li..."
+SYMLINK_SUCCESS=false
+if [ -d "/usr/local/bin" ]; then
+    if [ -w "/usr/local/bin" ]; then
+        ln -sf "$INSTALL_DIR/bin/library-insight" /usr/local/bin/library-insight 2>/dev/null
+        ln -sf "$INSTALL_DIR/bin/li" /usr/local/bin/li 2>/dev/null && SYMLINK_SUCCESS=true
+    else
+        sudo -n ln -sf "$INSTALL_DIR/bin/library-insight" /usr/local/bin/library-insight 2>/dev/null && sudo -n ln -sf "$INSTALL_DIR/bin/li" /usr/local/bin/li 2>/dev/null && SYMLINK_SUCCESS=true || sudo ln -sf "$INSTALL_DIR/bin/library-insight" /usr/local/bin/library-insight 2>/dev/null && sudo ln -sf "$INSTALL_DIR/bin/li" /usr/local/bin/li 2>/dev/null && SYMLINK_SUCCESS=true || true
+    fi
+fi
+
+if [ "$SYMLINK_SUCCESS" = true ]; then
+    echo "=================================================="
+    echo " SUCCESS: Library Insight installed globally!"
+    echo " You can now run 'library-insight' or 'li'."
+    echo "=================================================="
+else
+    echo "=================================================="
+    echo " SUCCESS: Library Insight installed at $INSTALL_DIR/bin!"
+    echo " Commands available: library-insight, li"
+    echo " Direct path: $HOME/.library-insight/bin/library-insight"
+    echo " To run directly without full path, add this to your .zshrc / .bashrc:"
+    echo "   export PATH=\"\$PATH:$INSTALL_DIR/bin\""
+    echo "=================================================="
+fi
+
+echo ""
+echo "=================================================="
+echo " Distributing AI Agent Skill to Detected Configs..."
+echo "=================================================="
+if [ "$USE_LOCAL" = true ] && [ -f ".agents/skills/library-insight/SKILL.md" ]; then
+    echo "Using freshly generated local AI Agent Skill definition..."
+    SKILL_SOURCE=".agents/skills/library-insight/SKILL.md"
+    cp -f "$SKILL_SOURCE" "$INSTALL_DIR/SKILL.md" 2>/dev/null || true
+else
+    echo "Fetching latest AI Agent Skill definition from GitHub..."
+    curl -fsSL -o "$INSTALL_DIR/SKILL.md" "$SKILL_RAW_URL" || true
+    SKILL_SOURCE="$INSTALL_DIR/SKILL.md"
+    if [ ! -s "$SKILL_SOURCE" ] && [ -f ".agents/skills/library-insight/SKILL.md" ]; then
+        SKILL_SOURCE=".agents/skills/library-insight/SKILL.md"
+    fi
+fi
+
+if [ -f "$SKILL_SOURCE" ]; then
+    PAIRS=(
+        "$HOME/.claude:$HOME/.claude/skills/library-insight"
+        "$HOME/.agents:$HOME/.agents/skills/library-insight"
+        "$HOME/.codex:$HOME/.codex/skills/library-insight"
+        "$HOME/.cursor:$HOME/.cursor/skills/library-insight"
+        "$HOME/.gemini:$HOME/.gemini/skills/library-insight"
+        "$HOME/.gemini:$HOME/.gemini/config/skills/library-insight"
+        "$HOME/.copilot:$HOME/.copilot/skills/library-insight"
+        "$HOME/.junie:$HOME/.junie/skills/library-insight"
+    )
+
+    COPIED_COUNT=0
+    for pair in "${PAIRS[@]}"; do
+        base_dir="${pair%%:*}"
+        skill_dir="${pair#*:}"
+        if [ -d "$base_dir" ]; then
+            mkdir -p "$skill_dir"
+            src_real=$(realpath "$SKILL_SOURCE" 2>/dev/null || echo "$SKILL_SOURCE")
+            dst_real=$(realpath "$skill_dir/SKILL.md" 2>/dev/null || echo "$skill_dir/SKILL.md")
+            if [ "$src_real" != "$dst_real" ]; then
+                cp -f "$SKILL_SOURCE" "$skill_dir/SKILL.md"
+            fi
+            echo " -> Detected $base_dir - Updated AI Skill at: $skill_dir/SKILL.md"
+            COPIED_COUNT=$((COPIED_COUNT + 1))
+        fi
+    done
+
+    if [ $COPIED_COUNT -gt 0 ]; then
+        echo "SUCCESS: AI Agent Skill distributed to $COPIED_COUNT detected config(s)!"
+    else
+        echo "Note: No global AI agent config folders detected in home directory."
+    fi
+else
+    echo "Note: Local SKILL.md source file not found. Skipping global skill installation."
+fi

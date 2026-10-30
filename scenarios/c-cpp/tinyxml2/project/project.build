@@ -1,0 +1,10 @@
+use cpp
+
+// xmltest.cpp has its main() and reads resources/
+build_cpp(
+    "tinyxml2",
+    list(),
+    sources = list("tinyxml2.cpp"),
+    include_dirs = list("."),
+    test_sources = list("xmltest.cpp"),
+)

@@ -1,0 +1,6 @@
+# Gson and coroutines
+steps = [
+    "build",
+    "build again",
+    "run --module kotlin-app",
+]

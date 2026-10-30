@@ -1,0 +1,10 @@
+# a C library with configured headers and an export header
+git = "https://github.com/commonmark/cmark"
+commit = "65d96448bb4261977dd87f3f4b4d003e76606a36"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+    "run -- --version",
+]

@@ -1,0 +1,5 @@
+# a library and its sample app
+steps = [
+    "build",
+    "build again",
+]

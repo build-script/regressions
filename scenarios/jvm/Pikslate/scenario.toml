@@ -1,0 +1,6 @@
+# a Kotlin program
+steps = [
+    "build",
+    "build again",
+    "run --module pikslate",
+]

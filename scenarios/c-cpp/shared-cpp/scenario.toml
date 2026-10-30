@@ -1,0 +1,8 @@
+# a shared C++ library and a program linking it
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+    "run",
+]

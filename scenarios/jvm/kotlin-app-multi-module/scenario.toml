@@ -1,0 +1,7 @@
+# a library and an app, IntelliJ set up
+steps = [
+    "build",
+    "build again",
+    "idea",
+    "run --module app",
+]

@@ -1,0 +1,5 @@
+# an app of Java and Kotlin
+steps = [
+    "build",
+    "build again",
+]

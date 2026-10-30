@@ -1,0 +1,15 @@
+use cpp
+
+cmark = build_cpp(
+    "cmark",
+    list(),
+    exclude = list("src/main.c"),
+    include_dirs = list("src"),
+    // like src/CMakeLists.txt: the version of CMakeLists.txt in cmark_version.h, and cmark_export.h
+    configured_headers = list("src/cmark_version.h.in"),
+    configured_values = list("PROJECT_VERSION_MAJOR=0", "PROJECT_VERSION_MINOR=31", "PROJECT_VERSION_PATCH=2"),
+    export_header = "cmark",
+    test_sources = list("api_test/**"),
+)
+
+build_cpp("cmark-cli", list(cmark), program = true, sources = list("src/main.c"))

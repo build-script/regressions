@@ -1,0 +1,3 @@
+use cpp
+
+build_cpp("search", list("sqlite3[fts5]"), program = true)

@@ -1,0 +1,14 @@
+use cpp
+
+sqlitecpp = build_cpp(
+    "SQLiteCpp",
+    list("sqlite3"),
+    // on in CMakeLists.txt: Column::getColumnOriginName(), also in the headers those using it see
+    public_defines = list("SQLITE_ENABLE_COLUMN_METADATA"),
+    test_dependencies = list("gtest"),
+    test_sources = list("tests/**"),
+    // a project of its own, which uses the installed library
+    test_exclude = list("tests/consumer/**"),
+)
+
+build_cpp("example1", list(sqlitecpp), program = true, sources = list("examples/example1/*.cpp"))

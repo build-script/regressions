@@ -1,0 +1,50 @@
+use android
+
+repositories = list(google(), maven_central())
+
+kpermissions = build_android_library(
+    "kpermissions",
+    "com.fondesa.kpermissions",
+    list("androidx.fragment:fragment:1.6.2"),
+    repositories,
+    min_sdk = 14,
+    directory = "kpermissions",
+)
+
+coroutines = build_android_library(
+    "kpermissions-coroutines",
+    "com.fondesa.kpermissions.coroutines",
+    list(kpermissions, "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0"),
+    repositories,
+    min_sdk = 14,
+    directory = "kpermissions-coroutines",
+)
+
+rx2 = build_android_library(
+    "kpermissions-rx2",
+    "com.fondesa.kpermissions.rx2",
+    list(kpermissions, "io.reactivex.rxjava2:rxjava:2.2.21"),
+    repositories,
+    min_sdk = 14,
+    directory = "kpermissions-rx2",
+)
+
+rx3 = build_android_library(
+    "kpermissions-rx3",
+    "com.fondesa.kpermissions.rx3",
+    list(kpermissions, "io.reactivex.rxjava3:rxjava:3.0.13"),
+    repositories,
+    min_sdk = 14,
+    directory = "kpermissions-rx3",
+)
+
+sample = build_android(
+    "sample",
+    "com.fondesa.kpermissions.sample",
+    list(kpermissions, "androidx.appcompat:appcompat:1.6.1", "com.squareup.leakcanary:leakcanary-android:2.13"),
+    repositories,
+    min_sdk = 14,
+    target_sdk = 34,
+    compile_sdk = 36,
+    directory = "sample",
+)

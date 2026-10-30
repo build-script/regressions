@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <application android:name=".WADBS"
+        android:allowBackup="true"
+        android:icon="@mipmap/app_icon"
+        android:label="@string/app_name_short"
+        android:roundIcon="@mipmap/app_icon"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.WirelessDebuggingSwitch"
+        tools:targetApi="31">
+
+        <activity android:name=".SettingsActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".GrantPermissionsActivity" android:exported="false"/>
+
+        <activity android:name=".preference.ActivityPreferenceEnableOnBoot"
+            android:exported="false"/>
+
+        <activity android:name=".preference.ActivityPreferencePrefix"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <activity android:name=".preference.ActivityPreferenceKdeConnect" android:exported="false"/>
+
+        <receiver android:name=".OnBootCompletedReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- Shizuku provider -->
+
+        <provider android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
+        <!-- Receiver for the "Restart app" notification action -->
+
+        <receiver android:name=".KillAppBroadcastReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="moe.smoothie.wadbs.KILL_APP"/>
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".AutoClosingActivity" android:exported="false" />
+
+        <!-- Basic Widget Components -->
+
+        <activity android:name=".widget.BasicWidgetActivity" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name=".widget.BasicWidget" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.ENABLED" />
+                <action android:name="android.appwidget.action.DISABLED" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_basic_info" />
+        </receiver>
+
+        <!-- Information Widget Components -->
+
+        <activity
+            android:name=".widget.InformationWidgetActivity"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name=".widget.InformationWidget"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.ENABLED" />
+                <action android:name="android.appwidget.action.DISABLED" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_information_info" />
+        </receiver>
+
+        <!-- Quick Settings Tile Service -->
+        
+        <service android:name=".QSTileService"
+            android:exported="true"
+            android:enabled="true"
+            android:icon="@drawable/baseline_phonelink_24"
+            android:label="@string/qs_tile_label_disabled"
+            android:description="@string/qs_tile_subtitle_hold_for_settings"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data android:name="android.service.quicksettings.ACTIVE_TILE"
+                android:value="false" />
+            <meta-data android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+                android:value="true" />
+        </service>
+
+        <receiver android:name=".ExtendedViewBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="moe.smoothie.wadbs.oneui_qs_action.COPY_DATA"/>
+                <action android:name="moe.smoothie.wadbs.oneui_qs_action.INSTANT_CONNECTION"/>
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

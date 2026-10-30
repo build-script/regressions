@@ -1,0 +1,20 @@
+use cpp
+
+macos = operating_system() == "macos"
+
+build_cpp(
+    "leveldb",
+    list(),
+    sources = list("db/**", "table/**", "util/**", "helpers/**"),
+    // the tests, the tool leveldbutil and Windows
+    exclude = list("**/*_test.c*", "util/testutil.cc", "db/leveldbutil.cc", "util/env_windows.cc"),
+    include_dirs = list("include", "."),
+    defines = list("LEVELDB_PLATFORM_POSIX", "LEVELDB_IS_BIG_ENDIAN=0"),
+    // what CMake finds: F_FULLFSYNC on macOS, fdatasync() on Linux
+    configured_headers = list("port/port_config.h.in"),
+    configured_values = list("HAVE_O_CLOEXEC", if macos { "HAVE_FULLFSYNC" } else { "HAVE_FDATASYNC" }),
+    test_dependencies = list("gtest"),
+    // those of leveldb_tests in CMakeLists.txt
+    test_sources = list("db/*_test.cc", "table/*_test.cc", "util/*_test.cc", "helpers/**/*_test.cc", "util/testutil.cc"),
+    test_exclude = list("db/fault_injection_test.cc", "util/env_test.cc", "util/env_posix_test.cc", "util/env_windows_test.cc"),
+)

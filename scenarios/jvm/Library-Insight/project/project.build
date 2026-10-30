@@ -1,0 +1,103 @@
+use kotlin
+
+// like the version catalog and jvmToolchain(17) of the Gradle build
+kotlin = "2.4.0"
+jdk = "17"
+version = "1.5.0"
+
+repositories = list(maven_central())
+serialization = list("serialization")
+ktor = list("io.ktor:ktor-client-core:3.5.1", "io.ktor:ktor-client-java:3.5.1")
+json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0"
+coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2"
+
+common = build_kotlin(
+    "library-insight-common",
+    ktor + list(json),
+    repositories,
+    directory = "library-insight-common",
+    kotlin_version = kotlin,
+    jdk = jdk,
+    test_dependencies = list("org.jetbrains.kotlin:kotlin-test")
+)
+
+model = build_kotlin(
+    "library-insight-model",
+    list(common, "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3"),
+    repositories,
+    plugins = serialization,
+    directory = "library-insight-model",
+    kotlin_version = kotlin,
+    jdk = jdk,
+)
+parser = build_kotlin(
+    "library-insight-parser",
+    list(
+        model,
+        "org.ow2.asm:asm:9.7.1",
+        "org.ow2.asm:asm-tree:9.7.1",
+        "com.github.javaparser:javaparser-core:3.26.2",
+        // without a version it gets kotlin_version, like version.ref = "kotlin" in the catalog
+        "org.jetbrains.kotlin:kotlin-compiler-embeddable",
+    ),
+    repositories,
+    directory = "library-insight-parser",
+    kotlin_version = kotlin,
+    jdk = jdk,
+    test_dependencies = list("org.jetbrains.kotlin:kotlin-test"),
+)
+kotlin_module = build_kotlin(
+    "library-insight-kotlin",
+    list(parser, "org.jetbrains.kotlin:kotlin-metadata-jvm"),
+    repositories,
+    directory = "library-insight-kotlin",
+    kotlin_version = kotlin,
+    jdk = jdk,
+)
+
+search = build_kotlin(
+    "library-insight-search",
+    dependencies = list(model),
+    repositories,
+    directory = "library-insight-search",
+    kotlin_version = kotlin,
+    jdk = jdk,
+    test_dependencies = list("org.jetbrains.kotlin:kotlin-test"),
+)
+
+export = build_kotlin(
+    "library-insight-export",
+    list(model),
+    repositories,
+    plugins = serialization,
+    directory = "library-insight-export",
+    kotlin_version = kotlin,
+    jdk = jdk,
+)
+core = build_kotlin(
+    "library-insight-core",
+    list(coroutines, parser, kotlin_module, search, export),
+    repositories,
+    directory = "library-insight-core",
+    kotlin_version = kotlin,
+    jdk = jdk,
+    test_dependencies = list("org.jetbrains.kotlin:kotlin-test"),
+)
+
+cli = build_kotlin(
+    "library-insight-cli",
+    list(core, common, "com.github.ajalt.clikt:clikt-jvm:4.4.0", coroutines, json, "org.slf4j:slf4j-simple:2.0.16") + ktor,
+    repositories,
+    main_class = "com.meet.libraryinsight.cli.MainKt",
+    plugins = serialization,
+    directory = "library-insight-cli",
+    kotlin_version = kotlin,
+    jdk = jdk,
+    // like processResources: @version@ in version.properties, the skill and its scripts.
+    // The Gradle build generates SKILL.md from docs/cli, the checked in file is the same.
+    resource_tokens = list("version=" + version),
+    resource_files = list(
+        "SKILL.md=../.agents/skills/library-insight/SKILL.md",
+        "scripts=../.agents/skills/library-insight/scripts",
+    ),
+)

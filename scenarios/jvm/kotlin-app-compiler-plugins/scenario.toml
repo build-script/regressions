@@ -1,0 +1,6 @@
+# Kotlin compiler plugins
+steps = [
+    "build",
+    "build again",
+    "run --module compiler-plugins",
+]

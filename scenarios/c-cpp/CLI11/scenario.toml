@@ -1,0 +1,10 @@
+# a library of only headers and an example program
+git = "https://github.com/CLIUtils/CLI11"
+commit = "1764a057b760e8873eab03f4635b4aaed5303a04"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+    "run -- --help",
+]

@@ -1,0 +1,13 @@
+use kotlin
+
+repositories = list(maven_central())
+
+crayon = build_kotlin("crayon", list(), repositories, test_dependencies = list("junit:junit:4.12", "org.jetbrains.kotlin:kotlin-test-junit"))
+
+example = build_kotlin(
+    "example",
+    list(crayon),
+    repositories,
+    main_class = "com.importre.example.Main",
+    directory = "example",
+)

@@ -1,0 +1,7 @@
+# a shared C++ library with jni.h, a Kotlin app and its tests loading it
+steps = [
+    "build",
+    "build again",
+    "test",
+    "run",
+]

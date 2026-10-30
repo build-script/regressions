@@ -1,0 +1,8 @@
+# a C++ program over curl and nlohmann-json
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+    "run",
+]

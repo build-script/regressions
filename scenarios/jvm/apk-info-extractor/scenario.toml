@@ -1,0 +1,5 @@
+# a Kotlin program reading apks
+steps = [
+    "build",
+    "build again",
+]

@@ -1,0 +1,3 @@
+use cpp
+
+build_cpp("app", list(), program = true, directory = "empty")

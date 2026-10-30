@@ -1,0 +1,56 @@
+use c
+
+macos = operating_system() == "macos"
+
+// what CMakeLists.txt compiles besides src/*.c and the sources of every Unix
+macos_sources = list(
+    "src/unix/darwin*.c",
+    "src/unix/fsevents.c",
+    "src/unix/kqueue.c",
+    "src/unix/bsd-ifaddrs.c",
+    "src/unix/random-getentropy.c",
+)
+linux_sources = list(
+    "src/unix/linux.c",
+    "src/unix/procfs-exepath.c",
+    "src/unix/random-getrandom.c",
+    "src/unix/random-sysctl-linux.c",
+)
+
+build_c(
+    "uv",
+    list(),
+    sources = list(
+        "src/*.c",
+        "src/unix/async.c",
+        "src/unix/core.c",
+        "src/unix/dl.c",
+        "src/unix/fs.c",
+        "src/unix/getaddrinfo.c",
+        "src/unix/getnameinfo.c",
+        "src/unix/loop-watcher.c",
+        "src/unix/loop.c",
+        "src/unix/pipe.c",
+        "src/unix/poll.c",
+        "src/unix/process.c",
+        "src/unix/proctitle.c",
+        "src/unix/random-devurandom.c",
+        "src/unix/signal.c",
+        "src/unix/stream.c",
+        "src/unix/tcp.c",
+        "src/unix/thread.c",
+        "src/unix/tty.c",
+        "src/unix/udp.c",
+    ) + if macos { macos_sources } else { linux_sources },
+    include_dirs = list("include"),
+    flags = list("-Isrc"),
+    defines = list("_FILE_OFFSET_BITS=64", "_LARGEFILE_SOURCE") + if macos {
+        list("_DARWIN_UNLIMITED_SELECT=1", "_DARWIN_USE_64_BIT_INODE=1")
+    } else {
+        list("_GNU_SOURCE", "_POSIX_C_SOURCE=200112")
+    },
+    link_flags = if macos { list("-lpthread") } else { list("-lpthread", "-ldl", "-lrt") },
+    // run-tests.c runs every test in a process of its own
+    test_sources = list("test/*.c"),
+    test_exclude = list("test/run-benchmarks.c", "test/benchmark-*.c", "test/runner-win.c", "test/appcontainer.c"),
+)

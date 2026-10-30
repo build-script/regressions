@@ -1,0 +1,5 @@
+# an app with maps
+steps = [
+    "build",
+    "build again",
+]

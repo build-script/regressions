@@ -1,0 +1,8 @@
+# a multi-module Kotlin CLI
+steps = [
+    "build",
+    "build again",
+    "test",
+    "run --module library-insight-cli -- --version",
+    "run --module library-insight-cli -- --help",
+]

@@ -1,0 +1,18 @@
+use android
+
+app = build_android(
+    "affirmations",
+    "com.example.affirmations",
+    list(
+        "androidx.core:core-ktx:1.8.0",
+        "androidx.appcompat:appcompat:1.4.2",
+        "com.google.android.material:material:1.6.1",
+        "androidx.constraintlayout:constraintlayout:2.1.4",
+    ),
+    list(google(), maven_central()),
+    min_sdk = 19,
+    target_sdk = 32,
+    // transitive R classes, the default of the Android Gradle plugin 7.2 of the project
+    non_transitive_r_class = false,
+    directory = "app",
+)

@@ -1,0 +1,8 @@
+# new of a kotlin project
+steps = [
+    "new kotlin hello",
+    "build hello/project.build",
+    "build again hello/project.build",
+    "test hello/project.build",
+    "run hello/project.build",
+]

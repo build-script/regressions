@@ -1,0 +1,6 @@
+# one module per test framework
+steps = [
+    "build",
+    "build again",
+    "test",
+]

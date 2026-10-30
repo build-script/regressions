@@ -1,0 +1,8 @@
+# TableGen of the LLVM of the system, by its llvm-config
+path = ["/opt/homebrew/opt/llvm/bin"]
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+]

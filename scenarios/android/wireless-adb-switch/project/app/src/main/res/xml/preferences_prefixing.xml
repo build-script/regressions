@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreferenceCompat
+        android:key="@string/key_prefix_connection_data"
+        android:title="@string/preference_switch_name_prefix_connection_data"
+        android:defaultValue="true"
+        app:layout="@layout/preference_big_switch" />
+
+    <Preference
+        android:summary="@string/preference_explanation_prefix_connection_data"
+        app:layout="@layout/preference_summary_only"/>
+
+    <moe.smoothie.wadbs.preference.TextInputPreference
+        android:key="@string/key_connection_data_prefix"
+        android:title="@string/preference_name_connection_data_prefix"
+        android:defaultValue="@string/default_connection_data_prefix"
+        android:summary="@string/preference_summary_connection_data_prefix" />
+
+</PreferenceScreen>

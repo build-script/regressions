@@ -1,0 +1,9 @@
+# a C++ library with GoogleTest tests
+git = "https://github.com/jbeder/yaml-cpp"
+commit = "c5e65360373d1d99d6b6848c991cd4fcee435009"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+]

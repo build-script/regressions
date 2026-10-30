@@ -1,0 +1,58 @@
+use cpp
+
+// this Mac: Homebrew's clang.cfg names an SDK it does not have
+sdk = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+
+// LLVM main with Clang, lld and MLIR, built once on this machine
+llvm = build_cmake(
+    "llvm",
+    git("https://github.com/llvm/llvm-project", "b08e005995ed29a2f89aa9a3f599a9d45db65523") + "/llvm",
+    options = list(
+        "LLVM_ENABLE_PROJECTS=clang;lld;mlir",
+        "LLVM_TARGETS_TO_BUILD=AArch64;X86",
+        "LLVM_INCLUDE_TESTS=OFF",
+        "LLVM_INCLUDE_BENCHMARKS=OFF",
+        "LLVM_INCLUDE_EXAMPLES=OFF",
+        "LLVM_INCLUDE_DOCS=OFF",
+        "LLVM_ENABLE_ZLIB=OFF",
+        "LLVM_ENABLE_ZSTD=OFF",
+        "LLVM_ENABLE_LIBXML2=OFF",
+        "LLVM_ENABLE_LIBEDIT=OFF",
+        "LLVM_PARALLEL_LINK_JOBS=2",
+        "CMAKE_OSX_SYSROOT=" + sdk,
+    ),
+    // -fno-rtti, every static library: MLIR has no llvm-config of its own
+    compile_flags_from = list("bin/llvm-config", "--cxxflags"),
+    link_flags = list("-lm", "-llzma"),
+)
+
+// MLIR's example of a dialect outside the tree of LLVM
+standalone_dir = git("https://github.com/llvm/llvm-project", "b08e005995ed29a2f89aa9a3f599a9d45db65523") + "/mlir/examples/standalone"
+
+standalone = build_cpp(
+    "standalone",
+    list(llvm),
+    directory = standalone_dir,
+    sources = list("lib/Standalone/**"),
+    flags = list("-isysroot", sdk),
+    // add_mlir_dialect(StandaloneOps standalone) and mlir_tablegen of include/Standalone/CMakeLists.txt
+    tablegen = list(
+        list("mlir-tblgen", "include/Standalone/StandaloneOps.td", "Standalone/StandaloneOps.h.inc", "-gen-op-decls"),
+        list("mlir-tblgen", "include/Standalone/StandaloneOps.td", "Standalone/StandaloneOps.cpp.inc", "-gen-op-defs"),
+        list("mlir-tblgen", "include/Standalone/StandaloneOps.td", "Standalone/StandaloneOpsTypes.h.inc", "-gen-typedef-decls", "-typedefs-dialect=standalone"),
+        list("mlir-tblgen", "include/Standalone/StandaloneOps.td", "Standalone/StandaloneOpsTypes.cpp.inc", "-gen-typedef-defs", "-typedefs-dialect=standalone"),
+        list("mlir-tblgen", "include/Standalone/StandaloneOps.td", "Standalone/StandaloneOpsDialect.h.inc", "-gen-dialect-decls", "-dialect=standalone"),
+        list("mlir-tblgen", "include/Standalone/StandaloneOps.td", "Standalone/StandaloneOpsDialect.cpp.inc", "-gen-dialect-defs", "-dialect=standalone"),
+        list("mlir-tblgen", "include/Standalone/StandalonePasses.td", "Standalone/StandalonePasses.h.inc", "--gen-pass-decls"),
+    ),
+)
+
+build_cpp(
+    "standalone-opt",
+    list(standalone),
+    program = true,
+    directory = standalone_dir,
+    sources = list("standalone-opt/standalone-opt.cpp"),
+    flags = list("-isysroot", sdk),
+    link_flags = list("-isysroot", sdk),
+)

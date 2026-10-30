@@ -1,0 +1,9 @@
+# a C++ library over abseil of vcpkg
+git = "https://github.com/google/re2"
+commit = "2da0056814cf180480a19f5cf811e7e1c054bf6d"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+]

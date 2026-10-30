@@ -1,0 +1,5 @@
+use c
+
+lz4 = build_c("lz4", list(), directory = "lib", sources = list("*.c"), include_dirs = list("."))
+
+build_c("lz4cli", list(lz4), program = true, directory = "programs", sources = list("*.c"))

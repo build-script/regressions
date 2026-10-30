@@ -1,0 +1,7 @@
+# a vcpkg port with a feature: sqlite3[fts5]
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+]

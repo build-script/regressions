@@ -1,0 +1,8 @@
+# Dagger, Moshi and an Android module
+steps = [
+    "build",
+    "build again",
+    "test",
+    "run --module dagger",
+    "run --module moshi",
+]

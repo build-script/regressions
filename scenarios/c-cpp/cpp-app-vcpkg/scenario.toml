@@ -1,0 +1,8 @@
+# a C++ library and program with vcpkg ports and GoogleTest and Catch2 tests
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+    "run",
+]

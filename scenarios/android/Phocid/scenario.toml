@@ -1,0 +1,5 @@
+# a Compose app with many libraries
+steps = [
+    "build",
+    "build again",
+]

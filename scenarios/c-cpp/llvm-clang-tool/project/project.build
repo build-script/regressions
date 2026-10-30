@@ -1,0 +1,35 @@
+use cpp
+
+// this Mac: Homebrew's clang.cfg names an SDK it does not have
+sdk = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+
+// LLVM main with Clang, lld and MLIR, built once on this machine
+llvm = build_cmake(
+    "llvm",
+    git("https://github.com/llvm/llvm-project", "b08e005995ed29a2f89aa9a3f599a9d45db65523") + "/llvm",
+    options = list(
+        "LLVM_ENABLE_PROJECTS=clang;lld;mlir",
+        "LLVM_TARGETS_TO_BUILD=AArch64;X86",
+        "LLVM_INCLUDE_TESTS=OFF",
+        "LLVM_INCLUDE_BENCHMARKS=OFF",
+        "LLVM_INCLUDE_EXAMPLES=OFF",
+        "LLVM_INCLUDE_DOCS=OFF",
+        "LLVM_ENABLE_ZLIB=OFF",
+        "LLVM_ENABLE_ZSTD=OFF",
+        "LLVM_ENABLE_LIBXML2=OFF",
+        "LLVM_ENABLE_LIBEDIT=OFF",
+        "LLVM_PARALLEL_LINK_JOBS=2",
+        "CMAKE_OSX_SYSROOT=" + sdk,
+    ),
+    // -fno-rtti, every static library: Clang's libraries are not in llvm-config
+    compile_flags_from = list("bin/llvm-config", "--cxxflags"),
+    link_flags = list("-lm", "-llzma"),
+)
+
+build_cpp(
+    "count-functions",
+    list(llvm),
+    program = true,
+    flags = list("-isysroot", sdk),
+    link_flags = list("-isysroot", sdk),
+)

@@ -1,0 +1,10 @@
+use kotlin
+
+jar = build_kotlin(
+    "pikslate",
+    list("com.jakewharton.mosaic:mosaic-runtime:0.7.0"),
+    list(maven_central(), google()),
+    main_class = "MainKt",
+    // the Mosaic Gradle plugin applies the Compose compiler, without it the app builds but crashes on start
+    plugins = list("compose"),
+)

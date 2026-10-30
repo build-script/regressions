@@ -1,0 +1,24 @@
+use cpp
+
+build_cpp(
+    "fmt",
+    list(),
+    // the C++20 module
+    exclude = list("src/fmt.cc"),
+    test_dependencies = list("gtest"),
+    test_sources = list("test/*-test.cc", "test/test-main.cc", "test/gtest-extra.cc", "test/util.cc"),
+    // those of the C++20 module, the header-only library, other flags or mocked POSIX
+    test_exclude = list(
+        "test/module-test.cc",
+        "test/header-only-test.cc",
+        "test/format-impl-test.cc",
+        "test/no-builtin-types-test.cc",
+        "test/scan-test.cc",
+        "test/unicode-test.cc",
+        "test/noexception-test.cc",
+        "test/enforce-checks-test.cc",
+        "test/posix-mock-test.cc",
+    ),
+    // a program per test, like CMake builds them
+    test_programs = list("test/*-test.cc"),
+)

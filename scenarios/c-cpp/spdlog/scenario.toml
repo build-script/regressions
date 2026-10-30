@@ -1,0 +1,9 @@
+# a compiled C++ library with Catch2 tests
+git = "https://github.com/gabime/spdlog"
+commit = "6d9805df3f588402b17073dcd13eb569ceda864d"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+]

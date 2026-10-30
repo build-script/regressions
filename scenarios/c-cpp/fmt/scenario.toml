@@ -1,0 +1,9 @@
+# fmt, its tests are programs of their own
+git = "https://github.com/fmtlib/fmt"
+commit = "f87a75e15262614ce8aa0e6a0664df9d0823fb92"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+]

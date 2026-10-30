@@ -1,0 +1,10 @@
+# a C library with a program of several sources
+git = "https://github.com/Cyan4973/xxHash"
+commit = "658147a68334e6b6b959194651f84e2842432d1b"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+    "run -- -V",
+]

@@ -1,0 +1,28 @@
+use android
+
+repositories = list(google(), maven_central())
+ui = list(
+    "androidx.appcompat:appcompat:1.4.0",
+    "androidx.constraintlayout:constraintlayout:2.1.2",
+    "com.google.android.material:material:1.4.0",
+)
+
+core = build_android_library(
+    "core",
+    "com.psoffritti.librarysampleapptemplate.core",
+    ui + list("com.getkeepsafe.taptargetview:taptargetview:1.15.0"),
+    repositories,
+    min_sdk = 15,
+    res_dirs = list("src/main/res", "src/main/res-public"),
+    directory = "core",
+)
+
+app = build_android(
+    "sample-app",
+    "com.psoffritti.librarysampleapptemplate.sampleapp",
+    ui + list(core),
+    repositories,
+    min_sdk = 15,
+    target_sdk = 31,
+    directory = "sample-app",
+)

@@ -1,0 +1,7 @@
+# a tool over the libraries of Clang, LLVM built from llvm-project
+platforms = ["macos"]
+slow = true
+steps = [
+    "build",
+    "build again",
+]

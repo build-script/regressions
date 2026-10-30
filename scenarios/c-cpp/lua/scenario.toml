@@ -1,0 +1,10 @@
+# the interpreter of Lua, C
+git = "https://github.com/lua/lua"
+commit = "8cb93bada561977eb370819e39d7d644e5fd0a3f"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+    "run -- -e print(6*7)",
+]

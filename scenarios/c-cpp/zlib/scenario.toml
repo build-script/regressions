@@ -1,0 +1,9 @@
+# zlib with its tests, C
+git = "https://github.com/madler/zlib"
+commit = "71747d1d39168833e0cae8ed84b8ce77cb049699"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+]

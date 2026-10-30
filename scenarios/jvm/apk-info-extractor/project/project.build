@@ -1,0 +1,12 @@
+use kotlin
+
+jar = build_kotlin(
+    "apkinfoextractor",
+    list(
+        "com.xenomachina:kotlin-argparser:2.0.7",
+        "com.shazam:axmlparser:1.0",
+        "com.google.code.gson:gson:2.8.6",
+    ),
+    list(maven_central()),
+    main_class = "com.github.vacxe.apkinfoextractor.ApkPublisherKt",
+)

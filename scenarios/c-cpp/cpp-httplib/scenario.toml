@@ -1,0 +1,9 @@
+# a library of only headers, its example serves forever
+git = "https://github.com/yhirose/cpp-httplib"
+commit = "290c4c0bbee4fc22e8250873c7fd6c08dafce9d7"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+]

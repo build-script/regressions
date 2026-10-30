@@ -1,0 +1,12 @@
+use kotlin
+
+jar = build_kotlin(
+    "kotson",
+    list("com.google.code.gson:gson:2.8.0"),
+    list(maven_central()),
+    // like the Gradle build, with Kotlin 2.4 six typeToken specs about star projections fail
+    kotlin_version = "1.1.51",
+    jdk = jdk("8", distribution = "zulu"),
+    // Spek 1 specs with kotlin.test assertions
+    test_dependencies = list("org.jetbrains.kotlin:kotlin-reflect", "org.jetbrains.kotlin:kotlin-test", "org.jetbrains.spek:spek-api:1.1.5"),
+)

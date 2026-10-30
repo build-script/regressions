@@ -1,0 +1,10 @@
+use cpp
+
+// header-only, example/hello.cc as a program
+build_cpp(
+    "hello",
+    list(),
+    program = true,
+    sources = list("example/hello.cc"),
+    include_dirs = list("."),
+)

@@ -1,0 +1,21 @@
+use android
+use cpp
+
+repositories = list(google(), maven_central())
+
+// for System.loadLibrary("greeter"): the app builds it for its ABIs
+greeter = build_cpp("greeter", list(), shared = true, jni = true, directory = "greeter")
+
+jni_android = build_android(
+    "jni-android",
+    "com.example.jni",
+    list(
+        greeter,
+        platform("androidx.compose:compose-bom:2026.09.00"),
+        "androidx.activity:activity-compose:1.13.0",
+        "androidx.compose.material3:material3",
+        "androidx.compose.ui:ui",
+    ),
+    repositories,
+    plugins = list("compose"),
+)

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="sliderPreferenceStyle" format="reference" />
+
+    <declare-styleable name="GlobalAttributeDeclaration">
+        <attr name="android:valueFrom" format="float"/>
+        <attr name="android:valueTo" format="float"/>
+        <attr name="android:stepSize" format="float"/>
+        <attr name="adjustable" format="boolean"/>
+        <attr name="showSliderValue" format="boolean"/>
+        <attr name="updatesContinuously" format="boolean"/>
+        <attr name="style" format="reference"/>
+        <attr name="displayWholeNumbers" format="boolean" />
+        <attr name="labelFormatter" format="enum">
+            <enum name="none" value="0"/>
+            <enum name="basic" value="1"/>
+            <enum name="suffix" value="2"/>
+            <enum name="suffix_int" value="3"/>
+        </attr>
+        <attr name="labelFormatterSuffix" format="string"/>
+    </declare-styleable>
+
+    <declare-styleable name="SliderPreference">
+        <attr name="android:valueTo"/>
+        <attr name="android:valueFrom"/>
+        <attr name="android:stepSize"/>
+        <attr name="adjustable"/>
+        <attr name="showSliderValue"/>
+        <attr name="updatesContinuously"/>
+        <attr name="style"/>
+        <attr name="displayWholeNumbers"/>
+        <attr name="labelFormatter"/>
+        <attr name="labelFormatterSuffix"/>
+    </declare-styleable>
+
+</resources>

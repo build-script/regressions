@@ -1,0 +1,10 @@
+use c
+
+xxhash = build_c(
+    "xxhash",
+    list(),
+    sources = list("xxhash.c"),
+    include_dirs = list("."),
+)
+
+build_c("xxhsum", list(xxhash), program = true, sources = list("cli/*.c"))

@@ -1,0 +1,8 @@
+# fmt from git() by its commit, a program using it
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+    "run",
+]

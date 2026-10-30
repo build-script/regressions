@@ -1,0 +1,5 @@
+# a codelab app
+steps = [
+    "build",
+    "build again",
+]

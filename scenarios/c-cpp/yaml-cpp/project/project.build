@@ -1,0 +1,10 @@
+use cpp
+
+build_cpp(
+    "yaml-cpp",
+    list(),
+    defines = list("YAML_CPP_STATIC_DEFINE"),
+    test_dependencies = list("gtest"),
+    // a copy of GoogleTest and the CMake checks
+    test_exclude = list("test/googletest-1.16.0/**", "test/cmake/**"),
+)

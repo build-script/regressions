@@ -1,0 +1,7 @@
+# the dialect example of MLIR, outside the tree of LLVM, LLVM built from llvm-project
+platforms = ["macos"]
+slow = true
+steps = [
+    "build",
+    "build again",
+]

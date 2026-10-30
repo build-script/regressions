@@ -1,0 +1,6 @@
+# a Kotlin CLI
+steps = [
+    "build",
+    "build again",
+    "run --module parnas -- --help",
+]

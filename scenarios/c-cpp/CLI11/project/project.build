@@ -1,0 +1,6 @@
+use cpp
+
+// header-only: include/, src/ is for precompiled builds
+cli11 = build_cpp("CLI11", list(), sources = list())
+
+build_cpp("simple", list(cli11), program = true, sources = list("examples/simple.cpp"))

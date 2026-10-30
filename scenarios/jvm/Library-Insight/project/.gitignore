@@ -1,0 +1,33 @@
+# Gradle files
+.gradle/
+build/
+
+# IntelliJ IDEA & IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+bin/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Tool local database index
+.library-insight-index.json
+
+# Local AI Context exports
+ai-context/
+
+# MkDocs local build output
+site/
+
+# Local properties
+local.properties
+
+# Local npm distribution packaging lib artifacts
+npm/lib/

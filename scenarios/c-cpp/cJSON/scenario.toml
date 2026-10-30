@@ -1,0 +1,9 @@
+# a C library with Unity tests
+git = "https://github.com/DaveGamble/cJSON"
+commit = "6d9f2443ab071f86e5d9b43025a40929ec41c46c"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+]

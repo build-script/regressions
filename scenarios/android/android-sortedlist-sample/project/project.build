@@ -1,0 +1,21 @@
+use android
+
+app = build_android(
+    "sortedlistsample",
+    "iammert.com.sortedlistsample",
+    list(
+        "com.android.support:appcompat-v7:26.1.0",
+        "com.android.support.constraint:constraint-layout:1.0.2",
+        "com.android.support:recyclerview-v7:26.1.0",
+    ),
+    list(google(), maven_central()),
+    min_sdk = 21,
+    target_sdk = 26,
+    // transitive R classes, the default of the Android Gradle plugin 3.0 of the project
+    non_transitive_r_class = false,
+    directory = "app",
+    test_dependencies = list("junit:junit:4.12"),
+    // the support test library of the project, which brings its runner
+    android_test_dependencies = list("com.android.support.test.espresso:espresso-core:2.2.2"),
+    test_instrumentation_runner = "android.support.test.runner.AndroidJUnitRunner",
+)

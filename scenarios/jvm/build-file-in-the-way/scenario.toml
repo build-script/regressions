@@ -1,0 +1,6 @@
+# files named BUILD of Bazel, the modules build into .build/
+steps = [
+    "build",
+    "build again",
+    "run --module app",
+]

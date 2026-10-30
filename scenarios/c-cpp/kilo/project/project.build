@@ -1,0 +1,9 @@
+use c
+
+build_c(
+    "kilo",
+    list(),
+    program = true,
+    sources = list("*.c"),
+    c_standard = "c99",
+)

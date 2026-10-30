@@ -1,0 +1,5 @@
+# an app with a tile service
+steps = [
+    "build",
+    "build again",
+]

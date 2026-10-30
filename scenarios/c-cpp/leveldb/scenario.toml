@@ -1,0 +1,9 @@
+# a C++ library with platform sources and GoogleTest tests
+git = "https://github.com/google/leveldb"
+commit = "bb74ef739973a70ca9f0d90788a1da89b788c0ad"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+]

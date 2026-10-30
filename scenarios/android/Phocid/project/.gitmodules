@@ -1,0 +1,3 @@
+[submodule "deps/OpusMetadataIo"]
+	path = deps/OpusMetadataIo
+	url = https://github.com/TJYSunset/OpusMetadataIo

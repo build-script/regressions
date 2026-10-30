@@ -1,0 +1,18 @@
+use c
+
+cjson = build_c(
+    "cjson",
+    list(),
+    sources = list("cJSON.c", "cJSON_Utils.c"),
+    include_dirs = list("."),
+)
+
+// the tests with Unity, in tests/, where they find their inputs
+build_c(
+    "cjson-tests",
+    list(cjson),
+    directory = "tests",
+    test_sources = list("*.c", "unity/src/unity.c"),
+    // a program per test, like CMake builds them
+    test_programs = list("parse_*.c", "print_*.c", "*_tests.c", "cjson_add.c", "readme_examples.c"),
+)

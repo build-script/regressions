@@ -1,0 +1,5 @@
+# new of an Android app
+steps = [
+    "new android hello",
+    "build hello/project.build",
+]

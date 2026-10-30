@@ -1,0 +1,16 @@
+use kotlin
+
+jar = build_kotlin(
+    "ilias-downloader-cli",
+    list(
+        "com.xenomachina:kotlin-argparser:2.0.7",
+        "io.github.microutils:kotlin-logging-jvm:2.0.3",
+        "ch.qos.logback:logback-classic:1.2.3",
+        "org.fusesource.jansi:jansi:2.0.1",
+        "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1",
+        "org.jsoup:jsoup:1.13.1",
+        "com.github.lookfirst:sardine:5.10",
+    ),
+    list(maven_central()),
+    main_class = "com.github.thetric.iliasdownloader.cli.CliKt",
+)

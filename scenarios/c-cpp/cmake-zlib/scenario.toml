@@ -1,0 +1,7 @@
+# zlib of git() built with build_cmake, a program using it
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+]

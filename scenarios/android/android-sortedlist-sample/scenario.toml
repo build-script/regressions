@@ -1,0 +1,5 @@
+# a sample app
+steps = [
+    "build",
+    "build again",
+]

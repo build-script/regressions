@@ -1,0 +1,44 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply from: '../dependencies.gradle'
+
+android {
+    namespace 'com.psoffritti.librarysampleapptemplate.sampleapp'
+    compileSdkVersion versions.compileSdk
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.compileSdk
+        versionCode versions.publishVersionCode
+        versionName versions.publishVersion
+
+        android.defaultConfig.vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    testImplementation "junit:junit:$versions.junit"
+    androidTestImplementation "androidx.test:runner:$versions.runner"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$versions.espressoCore"
+
+    implementation "androidx.appcompat:appcompat:$versions.androidxCore"
+    implementation "androidx.constraintlayout:constraintlayout:$versions.androidxConstraintLayout"
+    implementation "com.google.android.material:material:$versions.androidxMaterial"
+
+    implementation project(':core')
+}

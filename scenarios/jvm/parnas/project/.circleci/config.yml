@@ -1,0 +1,51 @@
+version: 2
+jobs:
+  build:
+    machine:
+      image: ubuntu-2404:current
+    working_directory: ~
+    steps:
+      - checkout
+      - run:
+          name: Install Amazon Corretto 17 and 25
+          command: |
+            wget -O - https://apt.corretto.aws/corretto.key | sudo gpg --dearmor -o /usr/share/keyrings/corretto-keyring.gpg
+            echo "deb [signed-by=/usr/share/keyrings/corretto-keyring.gpg] https://apt.corretto.aws stable main" | sudo tee /etc/apt/sources.list.d/amazon-corretto.list
+            sudo apt-get update && sudo apt-get install -y java-17-amazon-corretto-jdk java-25-amazon-corretto-jdk
+            echo "export JAVA_HOME=/usr/lib/jvm/java-25-amazon-corretto" >> $BASH_ENV
+      - run: ./gradlew build --stacktrace -Dorg.gradle.java.home=/usr/lib/jvm/java-17-amazon-corretto
+      - store_test_results:
+          path: build/parnas/test-results
+  release:
+    machine:
+      image: ubuntu-2404:current
+    working_directory: ~
+    steps:
+      - checkout
+      - run:
+          name: Install Amazon Corretto 17 and 25
+          command: |
+            wget -O - https://apt.corretto.aws/corretto.key | sudo gpg --dearmor -o /usr/share/keyrings/corretto-keyring.gpg
+            echo "deb [signed-by=/usr/share/keyrings/corretto-keyring.gpg] https://apt.corretto.aws stable main" | sudo tee /etc/apt/sources.list.d/amazon-corretto.list
+            sudo apt-get update && sudo apt-get install -y java-17-amazon-corretto-jdk java-25-amazon-corretto-jdk
+            echo "export JAVA_HOME=/usr/lib/jvm/java-25-amazon-corretto" >> $BASH_ENV
+      - run: ./gradlew githubRelease -Dorg.gradle.java.home=/usr/lib/jvm/java-17-amazon-corretto
+
+workflows:
+  version: 2
+  build-test-and-release:
+    jobs:
+      - build
+      - approve-release:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+      - release:
+          requires:
+            - approve-release
+          filters:
+            branches:
+              only: master

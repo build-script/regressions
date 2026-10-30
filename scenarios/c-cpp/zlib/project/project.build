@@ -1,0 +1,14 @@
+use c
+
+// the library of the .c files next to the script, its tests are test/example.c like with make test
+zlib = build_c(
+    "z",
+    list(),
+    sources = list("*.c"),
+    include_dirs = list("."),
+    // what ./configure finds on macOS and Linux
+    defines = list("Z_HAVE_UNISTD_H"),
+    test_sources = list("test/example.c"),
+)
+
+build_c("minigzip", list(zlib), program = true, sources = list("test/minigzip.c"))

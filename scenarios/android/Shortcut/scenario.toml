@@ -1,0 +1,5 @@
+# an app with shortcuts
+steps = [
+    "build",
+    "build again",
+]

@@ -1,0 +1,7 @@
+# the tutorial language of LLVM with its JIT, LLVM built from llvm-project
+platforms = ["macos"]
+slow = true
+steps = [
+    "build",
+    "build again",
+]

@@ -1,0 +1,21 @@
+use android
+
+app = build_android(
+    "osmphotos",
+    "net.osmphotos",
+    list(
+        "androidx.core:core-ktx:1.8.0",
+        "androidx.appcompat:appcompat:1.4.2",
+        "com.google.android.material:material:1.6.1",
+        "androidx.constraintlayout:constraintlayout:2.1.4",
+        "org.osmdroid:osmdroid-android:6.1.13",
+        "androidx.preference:preference-ktx:1.2.0",
+    ),
+    list(google(), maven_central()),
+    min_sdk = 21,
+    target_sdk = 32,
+    version_name = "0.1",
+    directory = "app",
+    test_dependencies = list("junit:junit:4.13.2"),
+    android_test_dependencies = list("androidx.test.ext:junit:1.1.3", "androidx.test.espresso:espresso-core:3.4.0"),
+)

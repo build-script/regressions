@@ -1,0 +1,48 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace = 'moe.smoothie.wadbs'
+    compileSdk = 37
+
+    defaultConfig {
+        applicationId = "moe.smoothie.wadbs"
+        targetSdk = 37
+        minSdk = 30
+        versionCode = 5
+        versionName = "1.3.1"
+    }
+
+    buildFeatures {
+        viewBinding = true
+        aidl = true
+        buildConfig = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles {
+                getDefaultProguardFile('proguard-android-optimize.txt')
+                'proguard-rules.pro'
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.8.0'
+    implementation 'com.google.android.material:material:1.14.0'
+    implementation 'androidx.core:core-ktx:1.19.1'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
+
+    implementation "com.github.topjohnwu.libsu:core:5.2.0"
+
+    implementation "dev.rikka.shizuku:api:13.1.5"
+    implementation "dev.rikka.shizuku:provider:13.1.5"
+
+    implementation(project(":widget-factory"))
+    compileOnly(project(":hidden-api-stub"))
+}

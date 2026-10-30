@@ -1,0 +1,14 @@
+use cpp
+
+build_cpp(
+    "spdlog",
+    list(),
+    // the compiled library, with the copy of fmt in include/spdlog/fmt/bundled, for those using it too
+    public_defines = list("SPDLOG_COMPILED_LIB"),
+    test_dependencies = list("catch2"),
+    test_sources = list("tests/**"),
+    // like CMakeLists.txt: some tests need the ones before
+    test_arguments = list("--order", "decl"),
+    // Windows, systemd and the checks of CMake
+    test_exclude = list("tests/test_eventlog.cpp", "tests/test_systemd*.cpp", "tests/cmake/**"),
+)

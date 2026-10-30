@@ -1,0 +1,6 @@
+# a Kotlin library over Gson
+steps = [
+    "build",
+    "build again",
+    "test",
+]

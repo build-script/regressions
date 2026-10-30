@@ -1,0 +1,17 @@
+use cpp
+
+// the LLVM of the system, llvm-config and llvm-tblgen in the PATH
+llvm_config = "llvm-config"
+llvm = system_library(
+    "llvm",
+    compile_flags_from = list(llvm_config, "--cxxflags"),
+    link_flags_from = list(llvm_config, "--ldflags", "--libs", "support", "--system-libs"),
+)
+
+build_cpp(
+    "colors",
+    list(llvm),
+    program = true,
+    // a table of the colors and its lookup, llvm-tblgen comes with the LLVM of Homebrew
+    tablegen = list(list("llvm-tblgen", "include/colors.td", "colors.inc", "-gen-searchable-tables")),
+)

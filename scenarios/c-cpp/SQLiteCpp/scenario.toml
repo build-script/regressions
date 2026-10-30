@@ -1,0 +1,10 @@
+# a C++ library over the sqlite3 port of vcpkg
+git = "https://github.com/SRombauts/SQLiteCpp"
+commit = "7302cd30b853e2d3d4f2ae1456b01180d068681e"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+    "run",
+]

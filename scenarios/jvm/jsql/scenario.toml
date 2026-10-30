@@ -1,0 +1,7 @@
+# a Kotlin CLI with tests
+steps = [
+    "build",
+    "build again",
+    "test",
+    "run --module jsql -- --help",
+]

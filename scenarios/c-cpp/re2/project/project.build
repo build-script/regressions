@@ -1,0 +1,21 @@
+use cpp
+
+build_cpp(
+    "re2",
+    list("abseil"),
+    sources = list("re2/**", "util/**"),
+    // what the tests and fuzzers need
+    exclude = list("re2/testing/**", "re2/fuzzing/**", "util/pcre.cc"),
+    include_dirs = list("."),
+    test_dependencies = list("gtest"),
+    test_sources = list("re2/testing/*.cc", "util/pcre.cc"),
+    // the benchmark and the tests CMake runs for minutes
+    test_exclude = list(
+        "re2/testing/regexp_benchmark.cc",
+        "re2/testing/exhaustive*_test.cc",
+        "re2/testing/random_test.cc",
+        "re2/testing/dfa_test.cc",
+    ),
+    // a program per test, like CMake builds them
+    test_programs = list("re2/testing/*_test.cc"),
+)

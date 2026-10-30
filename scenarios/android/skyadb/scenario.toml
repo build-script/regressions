@@ -1,0 +1,5 @@
+# an app with AIDL
+steps = [
+    "build",
+    "build again",
+]

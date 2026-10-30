@@ -1,0 +1,99 @@
+# Changelog
+
+## 0.2.12
+* Add AWS SDK `signin` module to support `aws login` (IAM Identity Center simplified access) credential flow
+
+## 0.2.11
+* Add option to install specific version to parnas.sh
+* Update AWS credentials provider chain to fallback to the default chain and add STS dependency to make IRSA work
+* Update parnas.sh to use http requests instead of API to check the latest version
+
+## 0.2.10
+* Added Claude Code skill for Parnas CLI (`parnas install-skill` to install globally)
+* Targeted Java runtime updated to 25, dependencies updated to address CVEs
+* Fixed excess logging from AWS SDK
+* CI: allow overwrite for snapshot versions
+
+## 0.2.9
+* Improved KeePass implementation with better error handling
+* Fixed parent directory creation for KeePass databases
+* Added comprehensive test coverage for KeePass special characters, long values, and error cases
+* Updated KeePassJava2-jackson dependency to 2.2.4
+* Updated clikt dependency to 3.5.4
+
+## 0.2.8
+* Migration from KeePassJava2-dom to KeePassJava2-jackson implementation
+
+## 0.2.7
+* Dependency updates: Gradle 8.11.1, Kotlin 2.0.21, testcontainers with localstack 1.20.3/3.0.0
+* Migration from an outdated openkeepass library to KeePassJava
+* Migration to AWS SDK v2
+
+## 0.2.5, 0.2.6
+* Minor version update for some libraries
+
+## 0.2.4 
+* Support deletion of multiple parameters
+
+## 0.2.3
+* Update dependencies
+
+## 0.2.2
+* Support plain `String` values for SSM
+* Support AWS authentication when running from AWS services (ECS, EC2, etc)
+* Implement info command to output information about backends
+
+## 0.2.1
+* Fix issue with NPE when receiving response to prompts on WSL (Windows Subsystem for Linux)
+* "y" is accepted as well as "yes" as a response to prompts
+* Renamed backend to storage, which makes more sense and match updated documentation
+* Documentation was updated along with help messages
+
+## 0.2.0
+* Implement prompts for potentially destructive commands (set, rm, update-from, destroy)
+* Cover destroy, diff and updateFrom methods with unit tests
+* Implement cross storage tests
+* Add log4j logging support
+* Improve destroy command output
+
+## 0.1.10
+* Add prefix support to `update-from` command
+* CLI version is now generated from version in `build.gradle.kts`
+
+## 0.1.9
+* Add silent type output, useful for automation, no parameters(secrets) will be displayed therefore it is safe to use with CI tools
+* Make profile and region setings for SSM optional when using aws environment config
+
+## 0.1.8
+* Limit amount of requests to SSM, so it won't throttle the application
+* Support AWS Credentials provider chain, now it is possible to pass AWS credentials via environment variables
+
+## 0.1.7
+* Fix performance issue with diff and update-from methods
+
+## 0.1.6
+* Fix diff display [#8](https://github.com/sndl/parnas/issues/8)
+
+## 0.1.5
+* Fix wrapper issue with update prompt when it could not connect to GitHub
+* Require --force flag when using `update-from` command
+* CLI Refactoring
+
+## 0.1.4
+
+* SSM Backend now supports automatic separator replacement with `separator-to-replace` option.
+I.e. if key you set separator to `.`, and upload key `section.key1` then it will be automatically uploaded to SSM as `prefix/section/key1`.
+This will keeping compatibility between different config backends (i.e. Toml) and will allow using SSM features like search by-path
+
+## 0.1.3
+
+* `list` command on SSM storage now returns all parameters with recursive call
+
+## 0.1.2
+
+* Add fallback to password from a file for Keepass storage. Filename can now be specified in config as `password-from-file`
+
+## 0.1.1
+
+* Change "cli" to "parnas" in usage help
+* Add fallback to password from a file for Keepass storage

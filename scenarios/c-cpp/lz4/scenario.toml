@@ -1,0 +1,10 @@
+# a C library and its command line program
+git = "https://github.com/lz4/lz4"
+commit = "5e08bd2e303d725daf4cf96499d3518b23792b02"
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+    "run -- -V",
+]

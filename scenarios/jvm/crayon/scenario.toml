@@ -1,0 +1,7 @@
+# a Kotlin library and its example
+steps = [
+    "build",
+    "build again",
+    "test",
+    "run --module example",
+]

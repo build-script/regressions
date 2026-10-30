@@ -1,0 +1,47 @@
+use android
+
+repositories = list(google(), maven_central(), maven("https://jitpack.io"))
+ui = list(
+    "androidx.appcompat:appcompat:1.8.0",
+    "com.google.android.material:material:1.14.0",
+    "androidx.core:core-ktx:1.19.1",
+    "androidx.preference:preference-ktx:1.2.1",
+)
+
+stub = build_android_library(
+    "hidden-api-stub",
+    "android",
+    list(),
+    repositories,
+    min_sdk = 30,
+    compile_sdk = 37,
+    directory = "hidden-api-stub",
+)
+
+widgets = build_android_library(
+    "widget-factory",
+    "moe.smoothie.widgetfactory",
+    ui,
+    repositories,
+    min_sdk = 30,
+    compile_sdk = 37,
+    directory = "widget-factory",
+)
+
+app = build_android(
+    "wadbs",
+    "moe.smoothie.wadbs",
+    ui + list(
+        widgets,
+        "com.github.topjohnwu.libsu:core:5.2.0",
+        "dev.rikka.shizuku:api:13.1.5",
+        "dev.rikka.shizuku:provider:13.1.5",
+    ),
+    repositories,
+    compile_only = list(stub),
+    min_sdk = 30,
+    compile_sdk = 37,
+    target_sdk = 37,
+    view_binding = true,
+    directory = "app",
+)

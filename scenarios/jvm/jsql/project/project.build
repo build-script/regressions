@@ -1,0 +1,24 @@
+use kotlin
+
+jar = build_kotlin(
+    "jsql",
+    list(
+        "org.apache.calcite:calcite-core:1.21.0",
+        "com.fasterxml.jackson.module:jackson-module-kotlin:2.11.0",
+        "com.jakewharton.picnic:picnic:0.3.1",
+        "com.github.ajalt:clikt:2.8.0",
+        "com.github.ajalt:mordant:1.2.1",
+        "org.slf4j:slf4j-simple:1.7.26",
+        "com.github.ben-manes.caffeine:caffeine:2.8.0",
+        "com.google.protobuf:protobuf-java:3.12.2",
+    ),
+    list(maven_central()),
+    main_class = "io.github.wlezzar.jsql.MainKt",
+    kotlin_version = "1.9.25",
+    // Kotest 4.1.1 of the Gradle build needs the Kotlin 1.3 standard library, 5.9.1 runs with 1.9
+    test_dependencies = list(
+        "io.kotest:kotest-runner-junit5-jvm:5.9.1",
+        "io.kotest:kotest-assertions-core-jvm:5.9.1",
+        "io.kotest:kotest-property-jvm:5.9.1",
+    ),
+)

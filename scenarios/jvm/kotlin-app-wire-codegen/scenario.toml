@@ -1,0 +1,6 @@
+# sources generated with Wire
+steps = [
+    "build",
+    "build again",
+    "run --module codegen-wire",
+]

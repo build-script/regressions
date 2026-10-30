@@ -1,0 +1,56 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'maven-publish'
+apply from: '../dependencies.gradle'
+
+android {
+    namespace 'com.psoffritti.librarysampleapptemplate.core'
+    compileSdkVersion versions.compileSdk
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.compileSdk
+        versionCode versions.publishVersionCode
+        versionName versions.publishVersion
+    }
+
+    sourceSets {
+        main.res.srcDirs = [
+            'src/main/res',
+            'src/main/res-public'
+        ]
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    testImplementation "junit:junit:$versions.junit"
+    androidTestImplementation "androidx.test:runner:$versions.runner"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$versions.espressoCore"
+
+    implementation "androidx.appcompat:appcompat:$versions.androidxCore"
+    implementation "androidx.constraintlayout:constraintlayout:$versions.androidxConstraintLayout"
+    implementation "com.google.android.material:material:$versions.androidxMaterial"
+
+    implementation 'com.getkeepsafe.taptargetview:taptargetview:1.15.0'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.psoffritti.librarysampleapptemplate'
+                artifactId = 'core'
+                version = versions.publishVersion
+            }
+        }
+    }
+}

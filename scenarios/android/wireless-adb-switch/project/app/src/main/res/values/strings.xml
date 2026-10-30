@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+
+    <string name="app_name_short" translatable="false">WADBS</string>
+    <string name="app_name" translatable="false">Wireless Debugging Switch</string>
+    <string name="kde_connect" translatable="false">KDE Connect</string>
+    <string name="title_shizuku" translatable="false">Shizuku</string>
+
+    <string name="label_wireless_debugging">Wireless debugging</string>
+    <string name="label_wireless_debugging_two_lines">Wireless\nDebugging</string>
+    <string name="label_disconnected">Disconnected</string>
+    <string name="label_connection_details">Connection details</string>
+    <string name="label_port">Port:</string>
+    <string name="label_address">Address:</string>
+    <string name="label_error">Error</string>
+    <string name="label_copy">Copy</string>
+    <string name="label_grant_permission">Grant permission</string>
+    <string name="label_granted">Granted</string>
+    <string name="label_not_needed">Not needed</string>
+    <string name="label_setup_shizuku">Setup Shizuku</string>
+    <string name="label_continue">Continue</string>
+    <string name="label_got_it">Got it!</string>
+    <string name="label_open_magisk">Open Magisk</string>
+    <string name="label_restart">Restart</string>
+    <string name="label_connect">Connect</string>
+    <string name="label_proceed">Proceed</string>
+    <string name="label_exit">Exit</string>
+
+    <string name="title_additional_setup">Additional setup</string>
+    <string name="title_root_access">Root access</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_root_access_notifications">Root access notifications</string>
+    <string name="title_instant_connection">Instant connection</string>
+    <string name="title_more_settings">More settings</string>
+    <string name="title_wifi_disabled">Wi-Fi is disabled</string>
+    <string name="title_debugging_disabled">Debugging is disabled</string>
+    <string name="title_updates_disabled">Updates disabled</string>
+
+    <string name="hint_refresh_shizuku">Refresh Shizuku availability</string>
+
+    <string name="message_failed_sending_clipboard">Failed to send clipboard!</string>
+    <string name="message_error_copying_connection_data">"Error copying connection information!\n    "</string>
+    <string name="message_copied">Copied!</string>
+    <string name="message_no_way_to_work">Both root access and Shizuku are unavailable.</string>
+    <string name="message_need_at_least_shizuku">You need to either provide root access or the permission to use Shizuku.</string>
+    <string name="message_welcome">Welcome to WADBS, a small companion app that makes your life as a developer much easier! Before you start, please, grant some necessary permissions.</string>
+    <string name="message_explain_notifications">WADBS will display a notification when it encounters an error which is usually because it lacks a needed set of privileges.</string>
+    <string name="message_explain_root_access">Root access allows WADBS to change the state of Wireless Debugging, gather connection data and interact with KDE Connect to instantly pair your Android device with your PC via local network.\nThis permission is optional if you use Shizuku.</string>
+    <string name="message_explain_shizuku">Alternatively to root access WADBS can utilize Shizuku to gain the needed set of privileges. Note that KDE Connect integration does not work with Shizuku.</string>
+    <string name="message_grant_permission_before_leaving">Grant all of the required permissions and then tap \"Continue\".</string>
+    <string name="message_disable_magisk_notification">Magisk displays a toast whenever some app is granted root access. WADBS frequently checks the state of Wireless Debugging on your device to update its widgets (you can edit the interval in settings). This makes Magisk\'s notifications somewhat annoying.\n\nYou can disable Magisk\'s root access notifications from the \"Superuser\" tab (tap on WADBS in the list there to see more options for it).</string>
+    <string name="message_kde_connect_ready">KDE Connect is ready.</string>
+    <string name="message_more_settings_description">Tweak more specific settings in the app.</string>
+    <string name="message_debugging_disabled">Shortcuts are not available while Wireless Debugging is disabled.</string>
+    <string name="message_wifi_disabled">Wireless Debugging is unavailable while Wi-Fi is disabled.</string>
+    <string name="message_before_adding_widgets">WADBS requires some additional configuration. Please, finish setting it up before managing widgets.</string>
+    <string name="message_updates_disabled">This widget requires periodical updates</string>
+
+    <!-- notification_title is used as a channel name as well -->
+    <!-- notification_title and notification_message_long is also used as an error message in One UI expanded QS view -->
+    <string name="notification_channel_description">Sends a notification when WADBS is missing sufficient privileges (root access or Shizuku)</string>
+    <string name="notification_title">Missing sufficient privileges</string>
+    <string name="notification_message_short">Expand this notification to learn more.</string>
+    <string name="notification_message_long">WADBS requires either root access or the permission to use Shizuku. Currently it seems like it has none of those. Ensure the minimum level of privileges and restart the app.</string>
+    <string name="notification_button">Restart to refresh privileges</string>
+
+    <string name="state_enabled">Enabled</string>
+    <string name="state_waiting">Waiting</string>
+    <string name="state_disabled">Disabled</string>
+
+    <string name="preference_name_connection_details">Connection details</string>
+    <string name="preference_summary_connection_details">Available at</string>
+
+    <string name="preference_name_enable_on_boot">Wireless debugging</string>
+    <string name="preference_switch_name_enable_on_boot">Enable on boot</string>
+    <string name="preference_summary_enable_on_boot">Enable wireless debugging right after system has booted up</string>
+    <string name="preference_explanation_enable_on_boot">When your phone boots, you are not connected to a Wi-Fi network immediately. WADBS will wait for a connection, enable wireless debugging and perform the sync (if enabled). If after the specified time your device has still not connected to any network, WADBS will stop the monitoring process. You can always enable wireless debugging manually.</string>
+
+    <string name="preference_name_after_boot_wait_time">Waiting time</string>
+    <string name="preference_summary_after_boot_wait_time">Amount of time WADBS should wait for a Wi-Fi connection after the boot is completed</string>
+
+    <string name="preference_name_copy_connection_data">Copy connection data</string>
+    <string name="preference_switch_name_copy_connection_data">Put connection data into the clipboard after enabling wireless debugging</string>
+
+    <string name="preference_summary_need_kde_connect">KDE Connect is not installed</string>
+    <string name="preference_summary_root_for_kde_connect">KDE Connect integration requires root privileges</string>
+    <string name="preference_summary_need_copying_data">Enable copying connection data first</string>
+
+    <string name="preference_name_kde_connect">KDE Connect integration</string>
+    <string name="preference_switch_name_kde_connect">Enable integration</string>
+    <string name="preference_summary_kde_connect">If this option is enabled your clipboard will be synced with KDE Connect when you enable wireless debugging using a widget. KDE Connect must be installed for this to work.</string>
+
+    <string name="preference_name_prefix_connection_data">Prefix connection data</string>
+    <string name="preference_switch_name_prefix_connection_data">Enable prefixing</string>
+    <string name="preference_explanation_prefix_connection_data">If this option is enabled, connection data will be prefixed with a string defined below. This allows user scripts to separate it from other clipboard data and automatically connect with your device.</string>
+
+    <string name="preference_name_connection_data_prefix">Prefix</string>
+    <string name="preference_summary_connection_data_prefix">Define prefix for your custom scripts.</string>
+
+    <string name="preference_name_background_transparency">Background transparency</string>
+    <string name="preference_summary_background_transparency">Specify how transparent this widget should be.</string>
+
+    <string name="preference_name_corner_radius">Corner radius</string>
+    <string name="preference_summary_corner_radius">Specify the corner roundness for widget\'s background.\nCorner radius is calculated relative to your system\'s default corner radius for widget background.</string>
+
+    <string name="preference_name_container_color">Use colorful background</string>
+    <string name="preference_summary_container_color">Choose whether to use surface or container color for widget background.\nTransparency is applied independently.</string>
+
+    <string name="preference_name_use_light_text">Light text</string>
+    <string name="preference_summary_use_light_text">Whether to use light-colored text.\nThis option may improve readability when using semi-transparent background on dark wallpaper.</string>
+
+    <string name="preference_category_other">Other</string>
+
+    <string name="preference_name_github">GitHub</string>
+    <string name="preference_summary_github">Visit this project\'s page on GitHub</string>
+
+    <string name="preference_name_report_issue">Open an issue</string>
+    <string name="preference_summary_report_issue">Report a bug or suggest a feature</string>
+
+    <string name="preference_name_app_version">App version</string>
+
+    <string name="widget_basic_name">Switch</string>
+    <string name="widget_basic_description">This widget provides a switch to enable Android\'s Wireless Debugging feature.</string>
+
+    <string name="widget_information_name">Connection Information</string>
+    <string name="widget_information_short_name">Wireless ADB</string>
+    <string name="widget_information_button_update">Update</string>
+    <string name="widget_information_description">Displays current Wireless Debugging connection information and allows to copy it.</string>
+
+    <string name="qs_tile_label_disabled">Enable debugging</string>
+    <string name="qs_tile_label_enabled">Disable debugging</string>
+    <string name="qs_tile_label_unavailable">Debugging unavailable</string>
+    <string name="qs_tile_label_missing_privileges">Missing privileges</string>
+    <string name="qs_tile_subtitle_hold_for_settings">Hold for settings</string>
+    <string name="qs_tile_subtitle_enable_wifi_first">Enable Wi-Fi first</string>
+    <string name="qs_tile_subtitle_no_connection_data">No connection data</string>
+    <string name="qs_tile_subtitle_missing_privileges">Refer to the app for instructions</string>
+    <string name="preference_name_secure_qs_tile">Secure quick settings tile</string>
+    <string name="preference_summary_secure_qs_tile">Require unlocking the device before wireless debugging can be toggled.</string>
+
+</resources>

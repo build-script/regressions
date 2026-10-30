@@ -1,0 +1,2 @@
+# a program in a directory without sources is an error
+steps = [{ command = "build", fails = true, output = "a program needs a main()" }]

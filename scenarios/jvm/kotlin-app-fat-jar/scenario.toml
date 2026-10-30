@@ -1,0 +1,6 @@
+# a fat jar with relocated packages
+steps = [
+    "build",
+    "build again",
+    "run",
+]

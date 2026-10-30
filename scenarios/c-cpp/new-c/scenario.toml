@@ -1,0 +1,7 @@
+# new and add of C
+steps = [
+    "new c tool",
+    "add c-library util tool/project.build",
+    "build tool/project.build",
+    "run tool/project.build",
+]
