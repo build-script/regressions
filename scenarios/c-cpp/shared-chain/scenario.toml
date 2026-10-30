@@ -1,0 +1,2 @@
+# a program over a shared library over another, with tests: they load them from build/lib
+steps = ["build", "build again", "test", "build --release", "run"]

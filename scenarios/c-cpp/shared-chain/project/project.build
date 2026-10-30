@@ -1,0 +1,5 @@
+use cpp
+
+base = build_cpp("base", list(), shared = true, directory = "base")
+math = build_cpp("math", list(base), shared = true, directory = "math", test_dependencies = list("doctest"))
+build_cpp("calc", list(math), program = true, directory = "calc")
