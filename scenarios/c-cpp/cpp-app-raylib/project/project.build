@@ -1,4 +1,6 @@
 use cpp
 
-// raylib draws with OpenGL, on macOS through Cocoa, IOKit and CoreVideo
-build_cpp("window", list("raylib"), program = true)
+// raylib calls X11 itself on Linux, no .pc file of vcpkg names it
+x11 = if operating_system() == "linux" { list("-lX11") } else { list() }
+
+build_cpp("window", list("raylib"), program = true, link_flags = x11)
