@@ -34,6 +34,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 240
     steps:
+      # the toolchains of the image the scenarios do not use, the cache needs the space
+      - name: Disk space
+        run: sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/share/swift /usr/local/share/powershell /usr/local/share/boost
+
       - uses: actions/checkout@v4
 
       - uses: actions/checkout@v4
@@ -83,6 +87,11 @@ jobs:
           name: logs-linux
           path: .logs
           include-hidden-files: true
+
+      # what vcpkg built the ports in stays out, its binary cache is in .home/caches
+      - name: Clean up
+        if: always()
+        run: rm -rf .work .home/vcpkg/*/buildtrees .home/vcpkg/*/packages .home/vcpkg/*/downloads
 
       - uses: actions/cache/save@v4
         if: always()
@@ -159,6 +168,10 @@ jobs:
           name: logs-macos
           path: .logs
           include-hidden-files: true
+
+      - name: Clean up
+        if: always()
+        run: rm -rf .work .home/vcpkg/*/buildtrees .home/vcpkg/*/packages .home/vcpkg/*/downloads
 
       - uses: actions/cache/save@v4
         if: always()
