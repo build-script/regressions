@@ -1,5 +1,2 @@
-# an app of Java and Kotlin
-steps = [
-    "build",
-    "build again",
-]
+# an app of Java and Kotlin. Its BuildConfig has the time of the build, like the original, so no build is up to date
+steps = ["build"]
