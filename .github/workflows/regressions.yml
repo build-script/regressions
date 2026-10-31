@@ -42,15 +42,15 @@ jobs:
           ref: ${{ env.BUILD_SCRIPT_REF }}
           path: build-script
 
-      # raylib needs the X11 headers and autotools for its ports, tablegen-colors an LLVM newer than Ubuntu's
+      # raylib needs the X11 headers and autotools for its ports, tablegen-colors the LLVM of Homebrew, 23
       - name: Packages
         run: |
           sudo apt-get update -q
           sudo apt-get install -q -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev autoconf autoconf-archive automake libtool
           wget -q https://apt.llvm.org/llvm.sh
-          sudo bash llvm.sh 21 > /dev/null
-          sudo apt-get install -q -y llvm-21-dev
-          echo /usr/lib/llvm-21/bin >> "$GITHUB_PATH"
+          sudo bash llvm.sh 23 > /dev/null
+          sudo apt-get install -q -y llvm-23-dev
+          echo /usr/lib/llvm-23/bin >> "$GITHUB_PATH"
 
       # the NDK of jni-android, with the sdkmanager and the licenses of the image
       - name: NDK
