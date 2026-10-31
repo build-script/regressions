@@ -42,12 +42,20 @@ jobs:
           ref: ${{ env.BUILD_SCRIPT_REF }}
           path: build-script
 
-      # raylib needs the X11 headers, tablegen-colors llvm-config and llvm-tblgen
+      # raylib needs the X11 headers and autotools for its ports, tablegen-colors an LLVM newer than Ubuntu's
       - name: Packages
         run: |
           sudo apt-get update -q
-          sudo apt-get install -q -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev llvm-dev
-          echo "$(llvm-config --bindir)" >> "$GITHUB_PATH"
+          sudo apt-get install -q -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev autoconf autoconf-archive automake libtool
+          wget -q https://apt.llvm.org/llvm.sh
+          sudo bash llvm.sh 21 > /dev/null
+          sudo apt-get install -q -y llvm-21-dev
+          echo /usr/lib/llvm-21/bin >> "$GITHUB_PATH"
+
+      # the NDK of jni-android, with the sdkmanager and the licenses of the image
+      - name: NDK
+        if: contains(inputs.kinds || 'android', 'android')
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;28.2.13676358" > /dev/null
 
       - uses: actions/cache/restore@v4
         with:
@@ -58,10 +66,6 @@ jobs:
             .sources
           key: linux-${{ github.run_id }}
           restore-keys: linux-
-
-      # the licenses the image of the runner accepted, for the packages build-script installs itself
-      - name: Android licenses
-        run: mkdir -p .home/android-sdk/licenses && cp "$ANDROID_HOME"/licenses/* .home/android-sdk/licenses/
 
       - name: build-script
         working-directory: build-script
@@ -78,6 +82,7 @@ jobs:
         with:
           name: logs-linux
           path: .logs
+          include-hidden-files: true
 
       - uses: actions/cache/save@v4
         if: always()
@@ -153,6 +158,7 @@ jobs:
         with:
           name: logs-macos
           path: .logs
+          include-hidden-files: true
 
       - uses: actions/cache/save@v4
         if: always()
