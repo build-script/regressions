@@ -1,0 +1,5 @@
+# arguments after build test -- go to the test programs, a filter of GoogleTest leaves out the failing test
+steps = [
+    { command = "test", fails = true, output = "FAILED, 1 of 2 tests" },
+    { command = "test -- --gtest_filter=Passing.*", output = "passed, 1 test" },
+]

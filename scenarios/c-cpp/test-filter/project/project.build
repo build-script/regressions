@@ -1,0 +1,3 @@
+use cpp
+
+build_cpp("filter", list(), test_dependencies = list("gtest"))

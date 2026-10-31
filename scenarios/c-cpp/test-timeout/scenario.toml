@@ -1,0 +1,4 @@
+# a test program that never ends is stopped after test_timeout
+steps = [
+    { command = "test", fails = true, output = "timed out after 2s" },
+]
