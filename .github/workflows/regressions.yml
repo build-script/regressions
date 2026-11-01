@@ -79,7 +79,7 @@ jobs:
           cargo test --release
 
       - name: Scenarios
-        run: python3 run.py --build build-script/target/release/build-script --kind ${{ inputs.kinds || 'c-cpp jvm android' }} ${{ inputs.scenarios }}
+        run: python3 run.py --build build-script/target/release/build-script ${{ inputs.scenarios }} --kind ${{ inputs.kinds || 'c-cpp jvm android' }}
 
       - uses: actions/upload-artifact@v4
         if: failure()
@@ -160,7 +160,7 @@ jobs:
           cargo test --release
 
       - name: Scenarios
-        run: python3 run.py --build build-script/target/release/build-script --kind ${{ inputs.kinds }} ${{ inputs.scenarios }}
+        run: python3 run.py --build build-script/target/release/build-script ${{ inputs.scenarios }} --kind ${{ inputs.kinds }}
 
       - uses: actions/upload-artifact@v4
         if: failure()
