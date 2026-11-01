@@ -14,6 +14,7 @@ import os
 import re
 import shlex
 import shutil
+import stat
 import subprocess
 import sys
 import time
@@ -50,6 +51,16 @@ class Scenario:
         return SYSTEM in platforms and (slow or not self.config.get("slow", False))
 
 
+def remove_tree(directory):
+    """Like shutil.rmtree, also the read-only files git writes on Windows"""
+    def writable(function, path, _):
+        os.chmod(path, stat.S_IWRITE)
+        function(path)
+
+    if directory.exists():
+        shutil.rmtree(directory, onexc=writable)
+
+
 def sources(scenario):
     """A checkout of the commit, fetched once into .sources/"""
     url, commit = scenario.config["git"], scenario.config["commit"]
@@ -57,11 +68,11 @@ def sources(scenario):
 
     if not checkout.is_dir():
         partial = checkout.with_name(checkout.name + ".partial")
-        shutil.rmtree(partial, ignore_errors=True)
+        remove_tree(partial)
         partial.mkdir(parents=True)
         for command in [["init", "--quiet"], ["fetch", "--quiet", "--depth", "1", url, commit], ["checkout", "--quiet", "FETCH_HEAD"]]:
             subprocess.run(["git", "-C", str(partial), *command], check=True)
-        shutil.rmtree(partial / ".git")
+        remove_tree(partial / ".git")
         partial.rename(checkout)
 
     return checkout
@@ -69,7 +80,7 @@ def sources(scenario):
 
 def prepare(scenario):
     work = ROOT / ".work" / scenario.kind / scenario.name
-    shutil.rmtree(work, ignore_errors=True)
+    remove_tree(work)
 
     if "git" in scenario.config:
         shutil.copytree(sources(scenario), work)
@@ -197,7 +208,7 @@ def main():
 
     os.environ.setdefault("BUILD_SCRIPT_HOME", str(ROOT / ".home"))
     logs = ROOT / ".logs"
-    shutil.rmtree(logs, ignore_errors=True)
+    remove_tree(logs)
     logs.mkdir()
 
     failed = []
