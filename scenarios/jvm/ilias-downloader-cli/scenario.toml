@@ -2,5 +2,7 @@
 steps = [
     "build",
     "build again",
-    "run --module ilias-downloader-cli -- --help",
+    # logback 1.2.3 looks for the class of jansi 1 under Windows, the project brings jansi 2: logback warns
+    # and writes without colors, with Gradle too
+    { command = "run --module ilias-downloader-cli -- --help", harmless = "org.fusesource.jansi.WindowsAnsiOutputStream" },
 ]
