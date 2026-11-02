@@ -1,4 +1,4 @@
-# exceptions again from an exception_ptr, of current_exception and of make_exception_ptr
+# exceptions again from an exception_ptr, of current_exception, of make_exception_ptr and nested ones
 steps = [
     { command = "run", output = "rethrown" },
     { command = "run --release", output = "rethrown" },

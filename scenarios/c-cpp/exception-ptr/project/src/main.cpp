@@ -3,6 +3,11 @@
 #include <initializer_list>
 #include <stdexcept>
 
+static void print(const char* text) {
+    std::printf("%s\n", text);
+    std::fflush(stdout);
+}
+
 int main() {
     std::exception_ptr caught;
 
@@ -18,10 +23,26 @@ int main() {
         try {
             std::rethrow_exception(pointer);
         } catch (const std::exception& error) {
-            std::printf("%s\n", error.what());
-            std::fflush(stdout);
+            print(error.what());
         }
     }
 
-    std::printf("rethrown\n");
+    // throw_with_nested keeps the current exception in a nested_exception, rethrow_if_nested throws it again
+    try {
+        try {
+            throw std::runtime_error("inner");
+        } catch (...) {
+            std::throw_with_nested(std::runtime_error("outer"));
+        }
+    } catch (const std::exception& outer) {
+        print(outer.what());
+
+        try {
+            std::rethrow_if_nested(outer);
+        } catch (const std::exception& inner) {
+            print(inner.what());
+        }
+    }
+
+    print("rethrown");
 }
