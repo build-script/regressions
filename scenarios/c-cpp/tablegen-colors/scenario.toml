@@ -1,5 +1,7 @@
 # TableGen of the LLVM of the system, by its llvm-config
 path = ["/opt/homebrew/opt/llvm/bin"]
+# the LLVM for Windows brings neither llvm-config nor its libraries
+platforms = ["macos", "linux"]
 steps = [
     "build",
     "build again",

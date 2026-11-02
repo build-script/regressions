@@ -1,18 +1,25 @@
 use cpp
 
-macos = operating_system() == "macos"
+system = operating_system()
+windows = system == "windows"
 
 build_cpp(
     "leveldb",
     list(),
     sources = list("db/**", "table/**", "util/**", "helpers/**"),
-    // the tests, the tool leveldbutil and Windows
-    exclude = list("**/*_test.c*", "util/testutil.cc", "db/leveldbutil.cc", "util/env_windows.cc"),
+    // the tests, the tool leveldbutil and the Env of the other systems
+    exclude = list("**/*_test.c*", "util/testutil.cc", "db/leveldbutil.cc", if windows { "util/env_posix.cc" } else { "util/env_windows.cc" }),
     include_dirs = list("include", "."),
-    defines = list("LEVELDB_PLATFORM_POSIX", "LEVELDB_IS_BIG_ENDIAN=0"),
-    // what CMake finds: F_FULLFSYNC on macOS, fdatasync() on Linux
+    defines = list("LEVELDB_IS_BIG_ENDIAN=0") + if windows { list("LEVELDB_PLATFORM_WINDOWS", "_UNICODE", "UNICODE") } else { list("LEVELDB_PLATFORM_POSIX") },
+    // what CMake finds: F_FULLFSYNC on macOS, fdatasync() on Linux, neither on Windows
     configured_headers = list("port/port_config.h.in"),
-    configured_values = list("HAVE_O_CLOEXEC", if macos { "HAVE_FULLFSYNC" } else { "HAVE_FDATASYNC" }),
+    configured_values = if system == "macos" {
+        list("HAVE_O_CLOEXEC", "HAVE_FULLFSYNC")
+    } else if system == "linux" {
+        list("HAVE_O_CLOEXEC", "HAVE_FDATASYNC")
+    } else {
+        list()
+    },
     test_dependencies = list("gtest"),
     // those of leveldb_tests in CMakeLists.txt
     test_sources = list("db/*_test.cc", "table/*_test.cc", "util/*_test.cc", "helpers/**/*_test.cc", "util/testutil.cc"),

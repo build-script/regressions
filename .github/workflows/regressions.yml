@@ -1,5 +1,5 @@
-# The scenarios against build-script/build: on Linux all of them, on Windows those of Java, Kotlin and
-# Android, macOS only when asked for, its minutes count ten times.
+# The scenarios against build-script/build: on Linux and Windows all of them, macOS only when asked for,
+# its minutes count ten times.
 name: regressions
 
 on:
@@ -144,8 +144,7 @@ jobs:
           cargo test --release
 
       - name: Scenarios
-        if: contains(inputs.kinds || 'jvm android', 'jvm') || contains(inputs.kinds || 'jvm android', 'android')
-        run: python run.py --build build-script/target/release/build-script.exe --kind jvm android ${{ inputs.scenarios }}
+        run: python run.py --build build-script/target/release/build-script.exe --kind ${{ inputs.kinds || 'c-cpp jvm android' }} ${{ inputs.scenarios }}
 
       - uses: actions/upload-artifact@v4
         if: failure()
