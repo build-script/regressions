@@ -1,5 +1,5 @@
-# The scenarios against build-script/build: on Linux all of them, on Windows the build and the tests of
-# build-script itself, macOS only when asked for, its minutes count ten times.
+# The scenarios against build-script/build: on Linux all of them, on Windows those of Java, Kotlin and
+# Android, macOS only when asked for, its minutes count ten times.
 name: regressions
 
 on:
@@ -16,6 +16,10 @@ on:
       scenarios:
         description: Names of scenarios, all of the kinds without
         default: ""
+      linux:
+        description: On Linux
+        type: boolean
+        default: true
       macos:
         description: Also on macOS
         type: boolean
@@ -31,6 +35,7 @@ env:
 
 jobs:
   linux:
+    if: github.event_name == 'push' || inputs.linux
     runs-on: ubuntu-24.04
     timeout-minutes: 240
     steps:
@@ -103,28 +108,66 @@ jobs:
             .sources
           key: linux-${{ github.run_id }}
 
+  # Java, Kotlin and Android, C and C++ are not set up for Windows yet
   windows:
     runs-on: windows-2025
-    timeout-minutes: 60
+    timeout-minutes: 240
+    env:
+      # the logs of the builds have characters that are not in the code page of the console
+      PYTHONUTF8: 1
     steps:
+      - run: git config --global core.longpaths true
+
+      - uses: actions/checkout@v4
+
       - uses: actions/checkout@v4
         with:
           repository: build-script/build
           ref: ${{ env.BUILD_SCRIPT_REF }}
+          path: build-script
 
-      - uses: actions/cache@v4
+      - uses: actions/cache/restore@v4
         with:
           path: |
             ~/.cargo/registry
-            target
-          key: windows-${{ hashFiles('Cargo.lock') }}-${{ github.run_id }}
-          restore-keys: windows-${{ hashFiles('Cargo.lock') }}-
+            build-script/target
+            .home
+            .sources
+          key: windows-${{ github.run_id }}
+          restore-keys: windows-
 
       - name: build-script
+        working-directory: build-script
         run: |
           rustup update stable --no-self-update
           cargo build --release
           cargo test --release
+
+      - name: Scenarios
+        if: contains(inputs.kinds || 'jvm android', 'jvm') || contains(inputs.kinds || 'jvm android', 'android')
+        run: python run.py --build build-script/target/release/build-script.exe --kind jvm android ${{ inputs.scenarios }}
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: logs-windows
+          path: .logs
+          include-hidden-files: true
+
+      - name: Clean up
+        if: always()
+        shell: bash
+        run: rm -rf .work
+
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: |
+            ~/.cargo/registry
+            build-script/target
+            .home
+            .sources
+          key: windows-${{ github.run_id }}
 
   macos:
     if: inputs.macos
