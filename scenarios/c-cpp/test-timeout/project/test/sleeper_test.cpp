@@ -1,5 +1,6 @@
-#include <unistd.h>
+#include <chrono>
+#include <thread>
 
 int main() {
-    for (;;) sleep(1);
+    for (;;) std::this_thread::sleep_for(std::chrono::seconds(1));
 }

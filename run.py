@@ -111,6 +111,7 @@ def step_of(entry):
         "output": entry.get("output"),
         # lines with it are no linkage errors, like a warning of the project itself
         "harmless": entry.get("harmless"),
+        "platforms": entry.get("platforms", ["macos", "linux", "windows"]),
         # programs that wait for input or serve forever have no run step
         "timeout": 300 if arguments[0] == "run" else 4 * 3600,
     }
@@ -147,6 +148,9 @@ def run(scenario, build, logs):
     failures = 0
     for index, entry in enumerate(scenario.config["steps"], 1):
         step = step_of(entry)
+        if SYSTEM not in step["platforms"]:
+            continue
+
         command = re.sub(r"[^\w.]+", "-", " ".join(step["arguments"][:2]))
         log = logs / f"{scenario.kind}-{scenario.name}-{index}-{command}.log"
         started = time.monotonic()

@@ -126,6 +126,12 @@ jobs:
           ref: ${{ env.BUILD_SCRIPT_REF }}
           path: build-script
 
+      # the NDK of jni-android, with the sdkmanager and the licenses of the image
+      - name: NDK
+        if: contains(inputs.kinds || 'android', 'android')
+        shell: bash
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager.bat" "ndk;28.2.13676358" > /dev/null
+
       - uses: actions/cache/restore@v4
         with:
           path: |
