@@ -130,7 +130,10 @@ jobs:
       - name: NDK
         if: contains(inputs.kinds || 'android', 'android')
         shell: bash
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager.bat" "ndk;28.2.13676358" > /dev/null
+        run: |
+          # yes ends with SIGPIPE once the sdkmanager is done
+          set +o pipefail
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager.bat" "ndk;28.2.13676358" > /dev/null
 
       - uses: actions/cache/restore@v4
         with:
