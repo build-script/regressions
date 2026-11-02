@@ -1,0 +1,8 @@
+# a shared C++ library and a program with its tests, compiled by zig instead of the compilers of the system
+steps = [
+    "build",
+    "build again",
+    "test",
+    "build --release",
+    { command = "run", output = "square(12) = 144" },
+]
