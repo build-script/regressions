@@ -1,4 +1,6 @@
 # a shared C++ library built with the NDK for the ABIs of an app
+# C and C++ are not set up for Windows yet
+platforms = ["macos", "linux"]
 steps = [
     "build",
     "build again",
