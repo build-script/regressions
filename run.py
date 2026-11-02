@@ -109,6 +109,8 @@ def step_of(entry):
         "again": again,
         "fails": entry.get("fails", False),
         "output": entry.get("output"),
+        # lines with it are no linkage errors, like a warning of the project itself
+        "harmless": entry.get("harmless"),
         # programs that wait for input or serve forever have no run step
         "timeout": 300 if arguments[0] == "run" else 4 * 3600,
     }
@@ -129,8 +131,10 @@ def problem_of(step, code, output):
         return "not up to date"
     if step["arguments"][0] == "test" and not step["fails"] and "> Tests" not in output:
         return "no test summary"
-    if step["arguments"][0] == "run" and (match := LINKAGE_ERRORS.search(output)):
-        return match.group(0)
+    if step["arguments"][0] == "run":
+        lines = [line for line in output.splitlines() if not (step["harmless"] and step["harmless"] in line)]
+        if match := LINKAGE_ERRORS.search("\n".join(lines)):
+            return match.group(0)
     return None
 
 
