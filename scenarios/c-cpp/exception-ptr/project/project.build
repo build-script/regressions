@@ -1,3 +1,0 @@
-use cpp
-
-build_cpp("rethrow", list(), program = true)

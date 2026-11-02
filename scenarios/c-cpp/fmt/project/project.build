@@ -21,6 +21,7 @@ build_cpp(
     ),
     // a program per test, like CMake builds them
     test_programs = list("test/*-test.cc"),
-    // clang with the C++ library of MSVC crashes in std::rethrow_if_nested, fmt tests that only with MSVC
-    test_arguments = if operating_system() == "windows" { list("--gtest_filter=-std_test.exception") } else { list() },
+    // clang with the ABI of MSVC ends the program with 0xc0000409 when an exception from an exception_ptr is
+    // thrown again in the catch of another one: fmt writes nested exceptions so, it tests that only with MSVC
+    test_arguments = if operating_system() == "windows" { list("--gtest_filter=-std_test.exception:std_test.exception_ptr") } else { list() },
 )
