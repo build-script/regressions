@@ -15,4 +15,7 @@ build_c(
     test_sources = list("*.c", "unity/src/unity.c"),
     // a program per test, like CMake builds them
     test_programs = list("parse_*.c", "print_*.c", "*_tests.c", "cjson_add.c", "readme_examples.c"),
+    // cJSON_Duplicate follows a circular reference 10000 deep, that needs more than the 1 MB stack of
+    // Windows without optimizations: 8 MB like on Linux
+    link_flags = if operating_system() == "windows" { list("-Wl,-stack:8388608") } else { list() },
 )

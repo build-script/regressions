@@ -4,6 +4,9 @@ commit = "338ac6ac0714e6d8043a2826c9b3bc78e85bb961"
 steps = [
     "build",
     "build again",
-    "test",
+    { command = "test", platforms = ["macos", "linux"] },
+    # the runner exits with the number of failed tests: on Windows spawn_no_ext, it starts a copy of the
+    # tests without .exe, which CMake makes after the build
+    { command = "test", platforms = ["windows"], fails = true, output = "tests failed (exit code: 1)" },
     "build --release",
 ]

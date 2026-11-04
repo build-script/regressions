@@ -1,6 +1,6 @@
 use c
 
-macos = operating_system() == "macos"
+system = operating_system()
 
 // the interpreter: lua.c has its main(), onelua.c is all of Lua in one file
 build_c(
@@ -10,7 +10,7 @@ build_c(
     sources = list("*.c"),
     exclude = list("onelua.c"),
     include_dirs = list("."),
-    defines = list("LUA_COMPAT_5_3", if macos { "LUA_USE_MACOSX" } else { "LUA_USE_LINUX" }),
-    // macOS links readline for the REPL, Linux opens it at runtime
-    link_flags = if macos { list("-lreadline") } else { list("-ldl") },
+    defines = list("LUA_COMPAT_5_3", if system == "macos" { "LUA_USE_MACOSX" } else if system == "linux" { "LUA_USE_LINUX" } else { "LUA_USE_WINDOWS" }),
+    // macOS links readline for the REPL, Linux opens it at runtime, Windows has neither
+    link_flags = if system == "macos" { list("-lreadline") } else if system == "linux" { list("-ldl") } else { list() },
 )

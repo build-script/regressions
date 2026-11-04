@@ -4,7 +4,8 @@ zlib = build_cmake(
     "zlib",
     git("https://github.com/madler/zlib", "v1.3.1"),
     options = list("ZLIB_BUILD_EXAMPLES=OFF"),
-    libraries = list("z"),
+    // libz.a, on Windows zlibstatic.lib
+    libraries = list(if operating_system() == "windows" { "zlibstatic" } else { "z" }),
 )
 
 build_cpp("packer", list(zlib), program = true)

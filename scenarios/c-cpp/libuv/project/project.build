@@ -1,8 +1,31 @@
 use c
 
-macos = operating_system() == "macos"
+system = operating_system()
+macos = system == "macos"
+windows = system == "windows"
 
-// what CMakeLists.txt compiles besides src/*.c and the sources of every Unix
+// what CMakeLists.txt compiles besides src/*.c: the sources of every Unix and those of the system
+unix_sources = list(
+    "src/unix/async.c",
+    "src/unix/core.c",
+    "src/unix/dl.c",
+    "src/unix/fs.c",
+    "src/unix/getaddrinfo.c",
+    "src/unix/getnameinfo.c",
+    "src/unix/loop-watcher.c",
+    "src/unix/loop.c",
+    "src/unix/pipe.c",
+    "src/unix/poll.c",
+    "src/unix/process.c",
+    "src/unix/proctitle.c",
+    "src/unix/random-devurandom.c",
+    "src/unix/signal.c",
+    "src/unix/stream.c",
+    "src/unix/tcp.c",
+    "src/unix/thread.c",
+    "src/unix/tty.c",
+    "src/unix/udp.c",
+)
 macos_sources = list(
     "src/unix/darwin*.c",
     "src/unix/fsevents.c",
@@ -20,37 +43,30 @@ linux_sources = list(
 build_c(
     "uv",
     list(),
-    sources = list(
-        "src/*.c",
-        "src/unix/async.c",
-        "src/unix/core.c",
-        "src/unix/dl.c",
-        "src/unix/fs.c",
-        "src/unix/getaddrinfo.c",
-        "src/unix/getnameinfo.c",
-        "src/unix/loop-watcher.c",
-        "src/unix/loop.c",
-        "src/unix/pipe.c",
-        "src/unix/poll.c",
-        "src/unix/process.c",
-        "src/unix/proctitle.c",
-        "src/unix/random-devurandom.c",
-        "src/unix/signal.c",
-        "src/unix/stream.c",
-        "src/unix/tcp.c",
-        "src/unix/thread.c",
-        "src/unix/tty.c",
-        "src/unix/udp.c",
-    ) + if macos { macos_sources } else { linux_sources },
+    sources = list("src/*.c") + if windows {
+        list("src/win/*.c")
+    } else if macos {
+        unix_sources + macos_sources
+    } else {
+        unix_sources + linux_sources
+    },
     include_dirs = list("include"),
     flags = list("-Isrc"),
-    defines = list("_FILE_OFFSET_BITS=64", "_LARGEFILE_SOURCE") + if macos {
-        list("_DARWIN_UNLIMITED_SELECT=1", "_DARWIN_USE_64_BIT_INODE=1")
+    defines = if windows {
+        list("WIN32_LEAN_AND_MEAN", "_WIN32_WINNT=0x0A00", "_CRT_DECLARE_NONSTDC_NAMES=0")
+    } else if macos {
+        list("_FILE_OFFSET_BITS=64", "_LARGEFILE_SOURCE", "_DARWIN_UNLIMITED_SELECT=1", "_DARWIN_USE_64_BIT_INODE=1")
     } else {
-        list("_GNU_SOURCE", "_POSIX_C_SOURCE=200112")
+        list("_FILE_OFFSET_BITS=64", "_LARGEFILE_SOURCE", "_GNU_SOURCE", "_POSIX_C_SOURCE=200112")
     },
-    link_flags = if macos { list("-lpthread") } else { list("-lpthread", "-ldl", "-lrt") },
+    link_flags = if windows {
+        list("-lpsapi", "-luser32", "-ladvapi32", "-liphlpapi", "-luserenv", "-lws2_32", "-ldbghelp", "-lole32", "-lshell32", "-lsynchronization")
+    } else if macos {
+        list("-lpthread")
+    } else {
+        list("-lpthread", "-ldl", "-lrt")
+    },
     // run-tests.c runs every test in a process of its own
     test_sources = list("test/*.c"),
-    test_exclude = list("test/run-benchmarks.c", "test/benchmark-*.c", "test/runner-win.c", "test/appcontainer.c"),
+    test_exclude = list("test/run-benchmarks.c", "test/benchmark-*.c", "test/appcontainer.c", if windows { "test/runner-unix.c" } else { "test/runner-win.c" }),
 )

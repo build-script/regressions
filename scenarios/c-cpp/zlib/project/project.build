@@ -6,8 +6,8 @@ zlib = build_c(
     list(),
     sources = list("*.c"),
     include_dirs = list("."),
-    // what ./configure finds on macOS and Linux
-    defines = list("Z_HAVE_UNISTD_H"),
+    // what ./configure finds on macOS and Linux, Windows has no unistd.h
+    defines = if operating_system() == "windows" { list() } else { list("Z_HAVE_UNISTD_H") },
     test_sources = list("test/example.c"),
 )
 
