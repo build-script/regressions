@@ -1,0 +1,4 @@
+use cpp
+
+math = build_cpp("math", list(), shared = true, directory = "math", toolchain = "zig")
+build_cpp("calc", list(math), program = true, directory = "calc", toolchain = "zig")
