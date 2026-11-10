@@ -12,4 +12,8 @@ steps = [
     # debug and release share their fingerprint, the debug apk is built again
     "build",
     "build again",
+    # on the device: the debug apps with the dex of every library, the release app shrunk by R8
+    { command = "run --module compose-app", started = "com.example.compose" },
+    { command = "run --module views-app", started = "com.example.views" },
+    { command = "run --module compose-app --release", started = "com.example.compose" },
 ]

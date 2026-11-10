@@ -2,4 +2,5 @@
 steps = [
     "build",
     "build again",
+    { command = "run --module phocid", started = "org.sunsetware.phocid" },
 ]

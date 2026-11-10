@@ -1,2 +1,6 @@
 # an app of Java and Kotlin. Its BuildConfig has the time of the build, like the original, so no build is up to date
-steps = ["build"]
+steps = [
+    "build",
+    # below API 24 its libraries are dexed in one run, not one by one into the cache
+    { command = "run --module notepad", started = "com.farmerbb.notepad.debug" },
+]
