@@ -1,0 +1,15 @@
+# release builds: R8, a signed apk and an app bundle, and an unsigned apk without R8
+steps = [
+    "build",
+    { command = "build --release", fails = true, output = "RELEASE_KEY_PASSWORD, which is not set" },
+    { command = "build --release", release_key = "release.jks", files = [
+        "compose-app/build/outputs/apk/release/compose-app-release.apk",
+        "compose-app/build/outputs/bundle/release/compose-app-release.aab",
+        "compose-app/build/outputs/mapping/release/mapping.txt",
+        "views-app/build/outputs/apk/release/views-app-release-unsigned.apk",
+    ] },
+    "build again --release",
+    # debug and release share their fingerprint, the debug apk is built again
+    "build",
+    "build again",
+]
