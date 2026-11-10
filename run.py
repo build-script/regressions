@@ -7,6 +7,8 @@
 #   python3 run.py --build ... --kind c-cpp jvm                             the C and C++ and the JVM ones
 #   python3 run.py --build ... cJSON new-kotlin                             these
 #   python3 run.py --build ... --slow                                       with those that take hours
+#   python3 run.py --build ... --device emulator-5580                       with the steps that start apps on it
+#   python3 run.py --build ... --device emulator-5580 --device-only         only the scenarios with such steps
 #
 # BUILD_SCRIPT_HOME is .home/ unless it is set. Logs go to .logs/, the projects are built in .work/.
 import argparse
@@ -50,6 +52,9 @@ class Scenario:
     def runs_here(self, slow):
         platforms = self.config.get("platforms", ["macos", "linux", "windows"])
         return SYSTEM in platforms and (slow or not self.config.get("slow", False))
+
+    def starts_apps(self):
+        return any(isinstance(entry, dict) and "started" in entry for entry in self.config["steps"])
 
 
 def remove_tree(directory):
@@ -116,6 +121,8 @@ def step_of(entry):
         "files": entry.get("files", []),
         # a keystore this step and those after it sign with
         "release_key": entry.get("release_key"),
+        # the application id of an app this step starts on the device, without --device it is left out
+        "started": entry.get("started"),
         "platforms": entry.get("platforms", ["macos", "linux", "windows"]),
         # programs that wait for input or serve forever have no run step
         "timeout": 300 if arguments[0] == "run" else 4 * 3600,
@@ -159,11 +166,65 @@ def create_release_key(keystore, environment):
                    env=environment, stdin=subprocess.DEVNULL, capture_output=True, check=True)
 
 
-def run(scenario, build, logs):
+def adb_of(environment):
+    """adb like build-script finds it: of ANDROID_HOME, ANDROID_SDK_ROOT or the SDK in its home, None before
+    build-script installed it with the first app"""
+    name = "adb.exe" if SYSTEM == "windows" else "adb"
+    roots = [environment.get("ANDROID_HOME"), environment.get("ANDROID_SDK_ROOT"), Path(environment["BUILD_SCRIPT_HOME"]) / "android-sdk"]
+    adbs = [Path(root) / "platform-tools" / name for root in roots if root]
+    return next((adb for adb in adbs if adb.is_file()), None)
+
+
+def adb(environment, *arguments):
+    """What adb printed for the device of ANDROID_SERIAL"""
+    return subprocess.run([adb_of(environment), "-s", environment["ANDROID_SERIAL"], *arguments], env=environment,
+                          stdin=subprocess.DEVNULL, capture_output=True, text=True, errors="replace").stdout
+
+
+def remove_from_device(application_id, environment):
+    """The app and the crashes of earlier runs off the device, so the step installs and starts it afresh"""
+    if adb_of(environment) is None:
+        return
+
+    adb(environment, "uninstall", application_id)
+    adb(environment, "logcat", "-b", "crash", "-c")
+
+
+def problem_on_device(application_id, environment, log):
+    """Why the app a step started does not run on the device, None when it runs. Its crash goes to the log."""
+    # a crash in the first frames comes a moment after am start returned
+    time.sleep(5)
+
+    crashes = adb(environment, "logcat", "-b", "crash", "-d").splitlines()
+    crashed = next((index for index, line in enumerate(crashes) if f"Process: {application_id}, PID" in line), None)
+
+    if crashed is not None:
+        with open(log, "a") as output_file:
+            output_file.write("\n".join(crashes) + "\n")
+
+        # its lines up to the next crash, the last cause names what is missing
+        end = next((index for index in range(crashed + 1, len(crashes)) if "FATAL EXCEPTION" in crashes[index]), len(crashes))
+        messages = [line.split(": ", 1)[-1] for line in crashes[crashed + 1:end]]
+        cause = next((message for message in reversed(messages) if message.startswith("Caused by: ")), messages[0] if messages else "")
+
+        # a class not found lists every dex file after "on path"
+        return f"crashed: {cause.removeprefix('Caused by: ').split(' on path:')[0][:200]}"
+
+    if not adb(environment, "shell", "pidof", application_id).strip():
+        return "not running"
+
+    return None
+
+
+def run(scenario, build, logs, device):
     work = prepare(scenario)
     environment = dict(os.environ)
     extra = [path for path in scenario.config.get("path", []) if Path(path).is_dir()]
     environment["PATH"] = os.pathsep.join([*extra, environment["PATH"]])
+
+    # build-script starts apps on it
+    if device:
+        environment["ANDROID_SERIAL"] = device
 
     failures = 0
     for index, entry in enumerate(scenario.config["steps"], 1):
@@ -171,8 +232,15 @@ def run(scenario, build, logs):
         if SYSTEM not in step["platforms"]:
             continue
 
+        if step["started"] and not device:
+            print(f"  skip  {step['label']} (no --device)")
+            continue
+
         if step["release_key"]:
             create_release_key(work / step["release_key"], environment)
+
+        if step["started"]:
+            remove_from_device(step["started"], environment)
 
         command = re.sub(r"[^\w.]+", "-", " ".join(step["arguments"][:2]))
         log = logs / f"{scenario.kind}-{scenario.name}-{index}-{command}.log"
@@ -187,6 +255,9 @@ def run(scenario, build, logs):
 
         output = log.read_text(errors="replace")
         problem = problem_of(step, code, output, work)
+        if problem is None and step["started"]:
+            problem = problem_on_device(step["started"], environment, log)
+
         seconds = round(time.monotonic() - started)
         last = next((line for line in reversed(output.splitlines()) if line.strip()), "")[:100]
 
@@ -198,7 +269,8 @@ def run(scenario, build, logs):
         print(f"  FAIL  {step['label']} ({seconds}s): {problem}, see {log.relative_to(ROOT)}")
         if IN_PIPELINE:
             print("::group::the end of the log")
-            print("\n".join(output.splitlines()[-80:]))
+            # with the crash of an app on the device
+            print("\n".join(log.read_text(errors="replace").splitlines()[-80:]))
             print("::endgroup::")
 
         # what follows needs this step
@@ -214,7 +286,12 @@ def main():
     parser.add_argument("--kind", nargs="*", default=[], help="c-cpp, jvm, android")
     parser.add_argument("--slow", action="store_true", help="also the scenarios that take hours")
     parser.add_argument("--list", action="store_true", help="only list the scenarios")
+    parser.add_argument("--device", help="serial of the device or emulator apps are started on, those steps are left out without")
+    parser.add_argument("--device-only", action="store_true", help="only the scenarios that start apps on the device")
     arguments = parser.parse_args()
+
+    if arguments.device_only and not arguments.device:
+        parser.error("--device-only needs --device")
 
     scenarios = [Scenario(file.parent) for file in sorted(SCENARIOS.glob("*/*/scenario.toml"))]
     unknown = set(arguments.names) - {scenario.name for scenario in scenarios}
@@ -226,6 +303,7 @@ def main():
         if (not arguments.names or scenario.name in arguments.names)
         and (not arguments.kind or scenario.kind in arguments.kind)
         and (arguments.names or scenario.runs_here(arguments.slow))
+        and (not arguments.device_only or scenario.starts_apps())
     ]
 
     if arguments.list:
@@ -245,7 +323,7 @@ def main():
     failed = []
     for scenario in chosen:
         print(f"{scenario.kind}/{scenario.name}: {scenario.about}", flush=True)
-        if run(scenario, build, logs):
+        if run(scenario, build, logs, arguments.device):
             failed.append(scenario.name)
         sys.stdout.flush()
 
