@@ -12,6 +12,7 @@
 import argparse
 import os
 import re
+import secrets
 import shlex
 import shutil
 import stat
@@ -113,6 +114,8 @@ def step_of(entry):
         "harmless": entry.get("harmless"),
         # files below the project this step has to leave behind
         "files": entry.get("files", []),
+        # a keystore this step and those after it sign with
+        "release_key": entry.get("release_key"),
         "platforms": entry.get("platforms", ["macos", "linux", "windows"]),
         # programs that wait for input or serve forever have no run step
         "timeout": 300 if arguments[0] == "run" else 4 * 3600,
@@ -144,6 +147,18 @@ def problem_of(step, code, output, work):
     return None
 
 
+def create_release_key(keystore, environment):
+    """A key only for this run, its password exists only in RELEASE_KEY_PASSWORD"""
+    environment["RELEASE_KEY_PASSWORD"] = secrets.token_urlsafe(24)
+
+    # from the JDK build-script installed in the steps before
+    keytool = next(Path(environment["BUILD_SCRIPT_HOME"]).glob("jdks/*/**/bin/keytool*"))
+
+    subprocess.run([keytool, "-genkeypair", "-keystore", keystore, "-alias", "release", "-keyalg", "RSA", "-keysize", "2048", "-validity", "2",
+                    "-dname", "CN=regressions", "-storepass:env", "RELEASE_KEY_PASSWORD", "-keypass:env", "RELEASE_KEY_PASSWORD"],
+                   env=environment, stdin=subprocess.DEVNULL, capture_output=True, check=True)
+
+
 def run(scenario, build, logs):
     work = prepare(scenario)
     environment = dict(os.environ)
@@ -155,6 +170,9 @@ def run(scenario, build, logs):
         step = step_of(entry)
         if SYSTEM not in step["platforms"]:
             continue
+
+        if step["release_key"]:
+            create_release_key(work / step["release_key"], environment)
 
         command = re.sub(r"[^\w.]+", "-", " ".join(step["arguments"][:2]))
         log = logs / f"{scenario.kind}-{scenario.name}-{index}-{command}.log"
