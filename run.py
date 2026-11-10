@@ -111,13 +111,15 @@ def step_of(entry):
         "output": entry.get("output"),
         # lines with it are no linkage errors, like a warning of the project itself
         "harmless": entry.get("harmless"),
+        # files below the project this step has to leave behind
+        "files": entry.get("files", []),
         "platforms": entry.get("platforms", ["macos", "linux", "windows"]),
         # programs that wait for input or serve forever have no run step
         "timeout": 300 if arguments[0] == "run" else 4 * 3600,
     }
 
 
-def problem_of(step, code, output):
+def problem_of(step, code, output, work):
     """What is wrong with a step, None when it went as expected"""
     if code is None:
         return f"timed out after {step['timeout']}s"
@@ -128,6 +130,9 @@ def problem_of(step, code, output):
         return f"exit {code}"
     if step["output"] and step["output"] not in output:
         return f"no \"{step['output']}\" in the output"
+    for file in step["files"]:
+        if not (work / file).is_file():
+            return f"no {file}"
     if step["again"] and ("Up to date" not in output or WORK_DONE.search(output)):
         return "not up to date"
     if step["arguments"][0] == "test" and not step["fails"] and "> Tests" not in output:
@@ -163,7 +168,7 @@ def run(scenario, build, logs):
                 code = None
 
         output = log.read_text(errors="replace")
-        problem = problem_of(step, code, output)
+        problem = problem_of(step, code, output, work)
         seconds = round(time.monotonic() - started)
         last = next((line for line in reversed(output.splitlines()) if line.strip()), "")[:100]
 
