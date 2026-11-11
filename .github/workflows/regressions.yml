@@ -1,5 +1,5 @@
 # The scenarios against build-script/build: on Linux and Windows all of them, macOS only when asked for,
-# its minutes count ten times.
+# its minutes count ten times. The steps that start apps run in a job of their own on an emulator.
 name: regressions
 
 on:
@@ -107,6 +107,70 @@ jobs:
             .home
             .sources
           key: linux-${{ github.run_id }}
+
+  # the emulator needs the KVM of the Linux machines
+  device:
+    if: (github.event_name == 'push' || inputs.linux) && contains(inputs.kinds || 'android', 'android')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm.rules > /dev/null
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: build-script/build
+          ref: ${{ env.BUILD_SCRIPT_REF }}
+          path: build-script
+
+      # it boots while build-script compiles
+      - name: Emulator
+        run: |
+          image="system-images;android-34;google_apis;x86_64"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" emulator "$image" > /dev/null
+          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --name regressions --package "$image" --device pixel_6 > /dev/null
+          nohup "$ANDROID_HOME/emulator/emulator" -avd regressions -port 5580 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect > emulator.log 2>&1 &
+
+      # what the Linux job left the last time, this job saves nothing
+      - uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            build-script/target
+            .home
+            .sources
+          key: linux-${{ github.run_id }}
+          restore-keys: linux-
+
+      - name: build-script
+        working-directory: build-script
+        run: |
+          rustup update stable --no-self-update
+          cargo build --release
+
+      - name: Boot
+        timeout-minutes: 10
+        run: |
+          adb="$ANDROID_HOME/platform-tools/adb"
+          "$adb" -s emulator-5580 wait-for-device
+          until [ "$("$adb" -s emulator-5580 shell getprop sys.boot_completed | tr -d '\r')" = 1 ]; do sleep 2; done
+
+      - name: Scenarios
+        run: python3 run.py --build build-script/target/release/build-script ${{ inputs.scenarios }} --device emulator-5580 --device-only
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: logs-device
+          path: |
+            .logs
+            emulator.log
+          include-hidden-files: true
 
   windows:
     runs-on: windows-2025
