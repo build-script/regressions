@@ -132,9 +132,14 @@ jobs:
       - name: Emulator
         run: |
           image="system-images;android-34;google_apis;x86_64"
+          # avdmanager takes the home of Java, the emulator HOME: both look here instead
+          export ANDROID_AVD_HOME="$RUNNER_TEMP/avd"
+          mkdir -p "$ANDROID_AVD_HOME"
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" emulator "$image" > /dev/null
-          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --name regressions --package "$image" --device pixel_6 > /dev/null
+          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --name regressions --package "$image" --device pixel_6
+          "$ANDROID_HOME/emulator/emulator" -list-avds | grep -qx regressions
           nohup "$ANDROID_HOME/emulator/emulator" -avd regressions -port 5580 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect > emulator.log 2>&1 &
+          echo $! > emulator.pid
 
       # what the Linux job left the last time, this job saves nothing
       - uses: actions/cache/restore@v4
@@ -157,8 +162,14 @@ jobs:
         timeout-minutes: 10
         run: |
           adb="$ANDROID_HOME/platform-tools/adb"
-          "$adb" -s emulator-5580 wait-for-device
-          until [ "$("$adb" -s emulator-5580 shell getprop sys.boot_completed | tr -d '\r')" = 1 ]; do sleep 2; done
+          until [ "$("$adb" -s emulator-5580 shell getprop sys.boot_completed 2> /dev/null | tr -d '\r')" = 1 ]; do
+            # an emulator that stopped never boots
+            if ! kill -0 "$(cat emulator.pid)" 2> /dev/null; then
+              tail -30 emulator.log
+              exit 1
+            fi
+            sleep 2
+          done
 
       - name: Scenarios
         run: python3 run.py --build build-script/target/release/build-script ${{ inputs.scenarios }} --device emulator-5580 --device-only
