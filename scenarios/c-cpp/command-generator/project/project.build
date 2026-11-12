@@ -1,0 +1,13 @@
+use c
+
+// a program that writes a lookup table, built first
+generator = build_c("generator", list(), program = true, directory = "generator")
+
+table = build_command(
+    "table",
+    list(generator, "{output}/table.h", "{output}/table.c"),
+    outputs = list("{output}/table.h", "{output}/table.c"),
+)
+
+// compiles table.c with its sources and finds table.h
+build_c("app", list(table), program = true, directory = "app")

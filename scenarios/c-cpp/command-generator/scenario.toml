@@ -1,0 +1,9 @@
+# build_command between C modules: a generator built first, the table it writes compiled into the app
+steps = [
+    "build",
+    "build again",
+    { command = "run --module app", output = "7 squared is 49" },
+    # the generator compiles again, the table and the app only when what it writes changed
+    { command = "build", changed = "generator/src/main.c" },
+    "build again",
+]
