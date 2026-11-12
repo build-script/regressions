@@ -121,6 +121,8 @@ def step_of(entry):
         "files": entry.get("files", []),
         # a keystore this step and those after it sign with
         "release_key": entry.get("release_key"),
+        # a file below the project this step changes first, the step has to build again
+        "changed": entry.get("changed"),
         # the application id of an app this step starts on the device, without --device it is left out
         "started": entry.get("started"),
         "platforms": entry.get("platforms", ["macos", "linux", "windows"]),
@@ -143,6 +145,8 @@ def problem_of(step, code, output, work):
     for file in step["files"]:
         if not (work / file).is_file():
             return f"no {file}"
+    if step["changed"] and not WORK_DONE.search(output):
+        return f"not built again after {step['changed']} changed"
     if step["again"] and ("Up to date" not in output or WORK_DONE.search(output)):
         return "not up to date"
     if step["arguments"][0] == "test" and not step["fails"] and "> Tests" not in output:
@@ -235,6 +239,11 @@ def run(scenario, build, logs, device):
         if step["started"] and not device:
             print(f"  skip  {step['label']} (no --device)")
             continue
+
+        if step["changed"]:
+            # one more line at the end changes the content, but not what it means
+            with open(work / step["changed"], "a") as changed_file:
+                changed_file.write("\n")
 
         if step["release_key"]:
             create_release_key(work / step["release_key"], environment)
