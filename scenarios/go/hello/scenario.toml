@@ -1,0 +1,11 @@
+# Go with a plugin: a library of go.mod and tests, a go.mod asking for a newer Go, a Go of its own
+steps = [
+    "build",
+    "build again",
+    { command = "build", changed = "hello/src/main.go" },
+    { command = "run --module hello", output = "Hello, Go" },
+    # go.mod asks for 1.27.4, the build starts with 1.26.11
+    { command = "run --module newer", output = "go1.27.4" },
+    { command = "run --module local", output = "go1.26.11" },
+    "test",
+]

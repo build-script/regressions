@@ -1,0 +1,10 @@
+// Go with a plugin of the project: build_go builds, runs and tests with the Go of go.dev
+use "./go/plugin.build"
+
+build_go("hello", directory = "hello")
+
+// go.mod asks for a newer Go than the one the build starts with
+build_go("newer", directory = "newer", version = "1.26.11")
+
+// exactly this Go, go.mod is not asked
+build_go("local", directory = "local", version = "1.26.11", toolchain = "local")

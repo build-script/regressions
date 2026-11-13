@@ -11,8 +11,8 @@ on:
         description: Commit, branch or tag of build-script/build
         default: main
       kinds:
-        description: Kinds of scenarios, c-cpp jvm android
-        default: c-cpp jvm android
+        description: Kinds of scenarios, c-cpp jvm android go
+        default: c-cpp jvm android go
       scenarios:
         description: Names of scenarios, all of the kinds without
         default: ""
@@ -84,7 +84,7 @@ jobs:
           cargo test --release
 
       - name: Scenarios
-        run: python3 run.py --build build-script/target/release/build-script ${{ inputs.scenarios }} --kind ${{ inputs.kinds || 'c-cpp jvm android' }}
+        run: python3 run.py --build build-script/target/release/build-script ${{ inputs.scenarios }} --kind ${{ inputs.kinds || 'c-cpp jvm android go' }}
 
       - uses: actions/upload-artifact@v4
         if: failure()
@@ -227,7 +227,7 @@ jobs:
           cargo test --release
 
       - name: Scenarios
-        run: python run.py --build build-script/target/release/build-script.exe ${{ inputs.scenarios }} --kind ${{ inputs.kinds || 'c-cpp jvm android' }}
+        run: python run.py --build build-script/target/release/build-script.exe ${{ inputs.scenarios }} --kind ${{ inputs.kinds || 'c-cpp jvm android go' }}
 
       - uses: actions/upload-artifact@v4
         if: failure()
