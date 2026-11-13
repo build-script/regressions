@@ -1,0 +1,8 @@
+# Go with the official plugin: use go takes it from github.com/build-script/plugins
+steps = [
+    "build",
+    "build again",
+    { command = "build", changed = "src/main.go" },
+    { command = "run", output = "Hello from the official plugin" },
+    "test",
+]

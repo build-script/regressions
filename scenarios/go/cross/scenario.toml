@@ -1,0 +1,5 @@
+# Go for another system: build_go(environment = ...) compiles for Linux on arm64 on every machine
+steps = [
+    "build",
+    "build again",
+]

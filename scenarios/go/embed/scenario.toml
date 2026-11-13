@@ -1,0 +1,8 @@
+# Go embeds a file with //go:embed: build_go(inputs = ...) builds again when it changes
+steps = [
+    "build",
+    "build again",
+    { command = "run", output = "Hello from a file" },
+    { command = "build", changed = "src/greeting.txt" },
+    "build again",
+]

@@ -1,0 +1,4 @@
+use go
+
+// the file next to the sources, which the Go files are not
+build_go("embed", inputs = list("src/greeting.txt"))

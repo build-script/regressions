@@ -1,0 +1,10 @@
+# new and add with the template of the official Go plugin: a project, and a workspace with a module
+steps = [
+    "new go hello",
+    { command = "run hello/project.build", output = "Hello from hello" },
+    "test hello/project.build",
+    "new workspace tools",
+    "add go api tools/project.build",
+    { command = "run tools/project.build", output = "Hello from api" },
+    "build again tools/project.build",
+]

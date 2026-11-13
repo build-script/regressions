@@ -1,0 +1,3 @@
+use go
+
+build_go("server", environment = list("GOOS=linux", "GOARCH=arm64"))
