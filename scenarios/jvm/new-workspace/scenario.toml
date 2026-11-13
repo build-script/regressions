@@ -1,0 +1,10 @@
+# new of a workspace, its modules added afterwards: a Kotlin library and a Kotlin program
+steps = [
+    "new workspace hello",
+    "add kotlin-library greeting hello/project.build",
+    "add kotlin-app app hello/project.build",
+    "build hello/project.build",
+    "build again hello/project.build",
+    "test hello/project.build",
+    { command = "run hello/project.build", output = "Hello" },
+]
