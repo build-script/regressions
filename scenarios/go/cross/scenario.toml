@@ -1,5 +1,5 @@
-# Go for another system: build_go(environment = ...) compiles for Linux on arm64 on every machine
+# Go for other systems: build_go(goos = ..., goarch = ...) on every machine, the programs named for where they run
 steps = [
-    "build",
+    { command = "build", files = ["build/commands/server/server", "build/commands/tool/tool.exe"] },
     "build again",
 ]
