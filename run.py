@@ -292,7 +292,7 @@ def main():
     parser = argparse.ArgumentParser(description="Runs the regression scenarios against a build-script binary")
     parser.add_argument("names", nargs="*", help="scenarios to run, all without")
     parser.add_argument("--build", default=os.environ.get("BUILD_SCRIPT_BINARY"), help="the build-script binary")
-    parser.add_argument("--kind", nargs="*", default=[], help="c-cpp, jvm, android, go")
+    parser.add_argument("--kind", nargs="*", default=[], help="general, c-cpp, jvm, android, go")
     parser.add_argument("--slow", action="store_true", help="also the scenarios that take hours")
     parser.add_argument("--list", action="store_true", help="only list the scenarios")
     parser.add_argument("--device", help="serial of the device or emulator apps are started on, those steps are left out without")

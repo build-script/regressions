@@ -1,0 +1,14 @@
+# new of a workspace, the modules added afterwards are of any kind: C, C++, Kotlin and Go side by side
+steps = [
+    "new workspace mixed",
+    "add c-library codec mixed/project.build",
+    "add cpp-app viewer mixed/project.build",
+    "add kotlin-app app mixed/project.build",
+    "add go service mixed/project.build",
+    "build mixed/project.build",
+    "build again mixed/project.build",
+    "test mixed/project.build",
+    { command = "run --module viewer mixed/project.build", output = "Hello from viewer" },
+    { command = "run --module app mixed/project.build", output = "Hello from app" },
+    { command = "run --module service mixed/project.build", output = "Hello from service" },
+]
