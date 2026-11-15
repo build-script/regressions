@@ -1,0 +1,14 @@
+# a script evaluated once per target: target(), operating_system() and executable() name each, host_target() the machine
+platforms = ["macos", "linux"]
+steps = [
+    { command = "build", output = "[linux-aarch64] target linux-aarch64 linux aarch64 app", files = [
+        "build/linux-aarch64/commands/info/info",
+        "build/windows-aarch64/commands/info/info",
+    ], absent = ["build/commands/info"] },
+    "build again",
+    { command = "build --target linux-x86_64-musl", output = "[linux-x86_64-musl] target linux-x86_64-musl linux x86_64 app", files = [
+        "build/linux-x86_64-musl/commands/info/info",
+    ] },
+    { command = "build --target linux-arm64", fails = true, output = "did you mean linux-aarch64?" },
+    { command = "run --target linux-aarch64", fails = true, output = "--target only goes with build" },
+]

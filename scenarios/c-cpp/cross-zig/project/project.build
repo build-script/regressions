@@ -1,0 +1,9 @@
+use c
+use cpp
+
+targets = list("linux-aarch64", "linux-x86_64-musl", "windows-aarch64", "macos-x86_64")
+
+// no targets of its own: it is built for those of the modules that link it
+core = build_cpp("core", list(), directory = "core")
+app = build_cpp("app", list(core), program = true, directory = "app", targets = targets)
+greeter = build_c("greeter", list(), shared = true, jni = true, directory = "greeter", targets = targets)

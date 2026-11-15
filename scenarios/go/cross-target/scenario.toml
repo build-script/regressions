@@ -1,0 +1,11 @@
+# one Go program for this machine and three other targets, each into build/<target>/, then once more for a target build --target names
+steps = [
+    { command = "build", binaries = [
+        "build/linux-aarch64/commands/server/server = elf-aarch64-static",
+        "build/linux-x86_64-musl/commands/server/server = elf-x86_64-static",
+        "build/windows-aarch64/commands/server/server.exe = pe-aarch64-exe",
+    ] },
+    "build again",
+    { command = "build --target macos-x86_64", binaries = ["build/macos-x86_64/commands/server/server = macho-x86_64-program"] },
+    { command = "run", output = "built for" },
+]

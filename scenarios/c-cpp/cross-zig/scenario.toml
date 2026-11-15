@@ -1,0 +1,14 @@
+# a C++ program and a JNI library in C for four other targets with zig, the static library they use follows them
+steps = [
+    { command = "build", binaries = [
+        "app/build/linux-aarch64/bin/app = elf-aarch64-dynamic",
+        "app/build/linux-x86_64-musl/bin/app = elf-x86_64-static",
+        "app/build/windows-aarch64/bin/app.exe = pe-aarch64-exe",
+        "app/build/macos-x86_64/bin/app = macho-x86_64-program",
+        "greeter/build/linux-aarch64/lib/libgreeter.so = elf-aarch64-shared",
+        "greeter/build/windows-aarch64/bin/greeter.dll = pe-aarch64-dll",
+        "greeter/build/macos-x86_64/lib/libgreeter.dylib = macho-x86_64-dylib",
+    ], files = ["greeter/build/windows-aarch64/lib/greeter.lib", "core/build/linux-aarch64/lib/libcore.a"], absent = ["app/build/bin"] },
+    "build again",
+    { command = "run", output = "hello targets" },
+]

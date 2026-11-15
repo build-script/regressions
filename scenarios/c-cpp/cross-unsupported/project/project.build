@@ -1,0 +1,3 @@
+use cpp
+
+build_cpp("formatted", list("fmt"), program = true, targets = list("linux-aarch64"))

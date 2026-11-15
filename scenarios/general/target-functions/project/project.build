@@ -1,0 +1,9 @@
+print("target", target(), operating_system(), architecture(), executable("app"), "host", host_target())
+
+// built for two targets the script names, not for this machine
+info = build_command(
+    "info",
+    list("sh", "-c", "echo " + target() + " " + executable("app") + " > {output}/info"),
+    outputs = list("{output}/info"),
+    targets = list("linux-aarch64", "windows-aarch64"),
+)

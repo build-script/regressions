@@ -1,0 +1,4 @@
+use go
+
+// this machine and three others: the targets of the program
+build_go("server", targets = list(host_target(), "linux-aarch64", "linux-x86_64-musl", "windows-aarch64"))
