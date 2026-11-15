@@ -1,0 +1,12 @@
+use c
+use cpp
+
+zlib = build_cmake(
+    "zlib",
+    git("https://github.com/madler/zlib", "v1.3.1"),
+    options = list("ZLIB_BUILD_EXAMPLES=OFF"),
+    // libz.a, for Windows libzlibstatic.a of MinGW
+    libraries = list(if operating_system() == "windows" { "zlibstatic" } else { "z" }),
+)
+
+build_c("packer", list(zlib), program = true, targets = list("linux-aarch64", "windows-x86_64", "macos-x86_64"))

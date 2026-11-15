@@ -1,0 +1,11 @@
+# a program with a port of vcpkg for three other targets: vcpkg builds the port with zig for each of them
+platforms = ["macos", "linux"]
+steps = [
+    { command = "build", binaries = [
+        "build/linux-aarch64/bin/formatted = elf-aarch64-dynamic",
+        "build/linux-x86_64-musl/bin/formatted = elf-x86_64-static",
+        "build/windows-x86_64/bin/formatted.exe = pe-x86_64-exe",
+    ] },
+    "build again",
+    { command = "run", output = "formatted with fmt" },
+]

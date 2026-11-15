@@ -1,4 +1,4 @@
-# vcpkg ports are installed for this machine only so far: a module with one for another target says so
+# a tool of a CMake installation runs only where it was built: compile_flags_from for another target says so
 steps = [
-    { command = "build", fails = true, output = "vcpkg ports and TableGen are for this machine only so far, not for linux-aarch64" },
+    { command = "build", fails = true, output = "compile_flags_from and link_flags_from run a program of the installation, one for linux-aarch64 runs nowhere here" },
 ]

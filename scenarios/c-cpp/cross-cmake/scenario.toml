@@ -1,0 +1,10 @@
+# zlib of git() built with build_cmake for three other targets, a toolchain file of zig for CMake, resources for Windows by zig rc
+platforms = ["macos", "linux"]
+steps = [
+    { command = "build", binaries = [
+        "build/linux-aarch64/bin/packer = elf-aarch64-dynamic",
+        "build/windows-x86_64/bin/packer.exe = pe-x86_64-exe",
+        "build/macos-x86_64/bin/packer = macho-x86_64-program",
+    ] },
+    "build again",
+]

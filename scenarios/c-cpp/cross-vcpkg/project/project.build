@@ -1,0 +1,4 @@
+use cpp
+
+// this machine for run, three others
+build_cpp("formatted", list("fmt"), program = true, targets = list(host_target(), "linux-aarch64", "linux-x86_64-musl", "windows-x86_64"))
