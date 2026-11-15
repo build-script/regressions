@@ -23,6 +23,7 @@ import subprocess
 import sys
 import time
 import tomllib
+import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -118,7 +119,7 @@ def step_of(entry):
         "output": entry.get("output"),
         # lines with it are no linkage errors, like a warning of the project itself
         "harmless": entry.get("harmless"),
-        # files below the project this step has to leave behind
+        # files below the project this step has to leave behind, `<archive>!<entry>` names one in an apk or jar
         "files": entry.get("files", []),
         # programs and libraries for a system and a processor, by their headers: "<path> = elf-aarch64",
         # "<path> = pe-x86_64-dll", a list so it can span lines
@@ -143,13 +144,27 @@ MACHO_CPUS = {0x01000007: "x86_64", 0x0100000C: "aarch64"}
 PE_MACHINES = {0x8664: "x86_64", 0xAA64: "aarch64", 0x14C: "x86"}
 
 
-def binary_kind(file, expected):
+def contents(work, path):
+    """The bytes of a file below the project, or of an entry of an apk, a jar or another zip file written
+    `<archive>!<entry>`, None when there is none"""
+    file, _, entry = path.partition("!")
+    if not (work / file).is_file():
+        return None
+    if not entry:
+        return (work / file).read_bytes()
+    with zipfile.ZipFile(work / file) as archive:
+        try:
+            return archive.read(entry)
+        except KeyError:
+            return None
+
+
+def binary_kind(data, expected):
     """What a program or library is for, written like `expected`: elf-aarch64, elf-x86_64-static (no
     interpreter), macho-x86_64-dylib, pe-x86_64-dll, pe-x86_64-exe. Only the parts `expected` names count."""
-    if not file.is_file():
+    if data is None:
         return "missing"
 
-    data = file.read_bytes()
     kind = []
 
     if data[:4] == b"\x7fELF":
@@ -196,13 +211,13 @@ def problem_of(step, code, output, work):
     if step["output"] and step["output"] not in output:
         return f"no \"{step['output']}\" in the output"
     for file in step["files"]:
-        if not (work / file).is_file():
+        if contents(work, file) is None:
             return f"no {file}"
     for file, expected in step["binaries"].items():
-        if (found := binary_kind(work / file, expected)) != expected:
+        if (found := binary_kind(contents(work, file), expected)) != expected:
             return f"{file} is {found}, not {expected}"
     for file in step["absent"]:
-        if (work / file).exists():
+        if (contents(work, file) is not None) if "!" in file else (work / file).exists():
             return f"{file} should not be there"
     if step["changed"] and not WORK_DONE.search(output):
         return f"not built again after {step['changed']} changed"

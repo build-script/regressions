@@ -1,0 +1,28 @@
+use android
+use cpp
+
+repositories = list(google(), maven_central())
+
+// linked into greeter, built for every target greeter is built for
+shout = build_cpp("shout", list(), directory = "shout")
+
+// two ABIs and not this machine: the app packs the one it is built for
+greeter = build_cpp(
+    "greeter", list(shout), shared = true, jni = true, directory = "greeter",
+    targets = list("android-aarch64", "android-x86_64"),
+)
+
+jni_android = build_android(
+    "jni-android",
+    "com.example.jni",
+    list(
+        greeter,
+        platform("androidx.compose:compose-bom:2026.09.00"),
+        "androidx.activity:activity-compose:1.13.0",
+        "androidx.compose.material3:material3",
+        "androidx.compose.ui:ui",
+    ),
+    repositories,
+    plugins = list("compose"),
+    targets = list("android-aarch64"),
+)

@@ -3,8 +3,8 @@ steps = [
     "build",
     "build again",
     { command = "build --release", files = [
-        "build/outputs/apk/release/jni-android-release-unsigned.apk",
-        "greeter/build/android/release/arm64-v8a/libgreeter.so",
+        "build/outputs/apk/release/jni-android-release-unsigned.apk!lib/x86/libgreeter.so",
+        "greeter/build/android-aarch64/lib/libgreeter.so",
     ] },
     "build again --release",
 ]
