@@ -18,6 +18,7 @@ import secrets
 import shlex
 import shutil
 import stat
+import struct
 import subprocess
 import sys
 import time
@@ -119,6 +120,11 @@ def step_of(entry):
         "harmless": entry.get("harmless"),
         # files below the project this step has to leave behind
         "files": entry.get("files", []),
+        # programs and libraries for a system and a processor, by their headers: "<path> = elf-aarch64",
+        # "<path> = pe-x86_64-dll", a list so it can span lines
+        "binaries": dict(map(str.strip, binary.split("=", 1)) for binary in entry.get("binaries", [])),
+        # files below the project this step must not leave behind, like a build for a target the script left out
+        "absent": entry.get("absent", []),
         # a keystore this step and those after it sign with
         "release_key": entry.get("release_key"),
         # a file below the project this step changes first, the step has to build again
@@ -129,6 +135,53 @@ def step_of(entry):
         # programs that wait for input or serve forever have no run step
         "timeout": 300 if arguments[0] == "run" else 4 * 3600,
     }
+
+
+# the processors of ELF, Mach-O and PE by the numbers their headers give them
+ELF_MACHINES = {0x3E: "x86_64", 0xB7: "aarch64", 0x28: "arm", 0x03: "x86"}
+MACHO_CPUS = {0x01000007: "x86_64", 0x0100000C: "aarch64"}
+PE_MACHINES = {0x8664: "x86_64", 0xAA64: "aarch64", 0x14C: "x86"}
+
+
+def binary_kind(file, expected):
+    """What a program or library is for, written like `expected`: elf-aarch64, elf-x86_64-static (no
+    interpreter), macho-x86_64-dylib, pe-x86_64-dll, pe-x86_64-exe. Only the parts `expected` names count."""
+    if not file.is_file():
+        return "missing"
+
+    data = file.read_bytes()
+    kind = []
+
+    if data[:4] == b"\x7fELF":
+        little = data[5] == 1
+        order = "<" if little else ">"
+        e_type, e_machine = struct.unpack_from(order + "HH", data, 16)
+        kind = ["elf", ELF_MACHINES.get(e_machine, hex(e_machine))]
+        # the program headers: one of type PT_INTERP names the dynamic loader
+        is_64 = data[4] == 2
+        if is_64:
+            e_phoff, = struct.unpack_from(order + "Q", data, 32)
+            e_phentsize, e_phnum = struct.unpack_from(order + "HH", data, 54)
+        else:
+            e_phoff, = struct.unpack_from(order + "I", data, 28)
+            e_phentsize, e_phnum = struct.unpack_from(order + "HH", data, 42)
+        types = [struct.unpack_from(order + "I", data, e_phoff + index * e_phentsize)[0] for index in range(e_phnum)]
+        kind.append("dynamic" if 3 in types else "static" if e_type == 2 else "shared")
+    elif data[:4] in (b"\xcf\xfa\xed\xfe", b"\xfe\xed\xfa\xcf"):
+        cpu, = struct.unpack_from("<I", data, 4)
+        filetype, = struct.unpack_from("<I", data, 12)
+        kind = ["macho", MACHO_CPUS.get(cpu, hex(cpu)), {2: "program", 6: "dylib"}.get(filetype, str(filetype))]
+    elif data[:2] == b"MZ":
+        offset, = struct.unpack_from("<I", data, 0x3C)
+        if data[offset:offset + 4] != b"PE\0\0":
+            return "MZ without PE"
+        machine, = struct.unpack_from("<H", data, offset + 4)
+        characteristics, = struct.unpack_from("<H", data, offset + 22)
+        kind = ["pe", PE_MACHINES.get(machine, hex(machine)), "dll" if characteristics & 0x2000 else "exe"]
+    else:
+        return "no program or library"
+
+    return "-".join(kind[:len(expected.split("-"))])
 
 
 def problem_of(step, code, output, work):
@@ -145,6 +198,12 @@ def problem_of(step, code, output, work):
     for file in step["files"]:
         if not (work / file).is_file():
             return f"no {file}"
+    for file, expected in step["binaries"].items():
+        if (found := binary_kind(work / file, expected)) != expected:
+            return f"{file} is {found}, not {expected}"
+    for file in step["absent"]:
+        if (work / file).exists():
+            return f"{file} should not be there"
     if step["changed"] and not WORK_DONE.search(output):
         return f"not built again after {step['changed']} changed"
     if step["again"] and ("Up to date" not in output or WORK_DONE.search(output)):
