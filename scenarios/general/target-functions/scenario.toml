@@ -10,5 +10,5 @@ steps = [
         "build/linux-x86_64-musl/commands/info/info",
     ] },
     { command = "build --target linux-arm64", fails = true, output = "did you mean linux-aarch64?" },
-    { command = "run --target linux-aarch64", fails = true, output = "--target only goes with build" },
+    { command = "clean --target linux-aarch64", fails = true, output = "--target only goes with build, run and test" },
 ]

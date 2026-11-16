@@ -1,0 +1,4 @@
+use cpp
+
+// built for the target run and test name, which starts it: this machine itself or a runner
+app = build_cpp("app", list(), program = true)
