@@ -1,13 +1,11 @@
-# an app for one ABI with a JNI library for two, which links a static library, none of it for this machine
+# an app for two ABIs with a JNI library for three, which links a static library, none of it for this machine
 steps = [
-    { command = "build", files = [
-        "build/outputs/apk/debug/jni-android-debug.apk!lib/arm64-v8a/libgreeter.so",
-        "greeter/build/android-x86_64/lib/libgreeter.so",
-    ], binaries = [
+    { command = "build", binaries = [
         "build/outputs/apk/debug/jni-android-debug.apk!lib/arm64-v8a/libgreeter.so = elf-aarch64-shared",
-        "greeter/build/android-x86_64/lib/libgreeter.so = elf-x86_64-shared",
+        "build/outputs/apk/debug/jni-android-debug.apk!lib/x86_64/libgreeter.so = elf-x86_64-shared",
+        "greeter/build/android-x86/lib/libgreeter.so = elf-x86-shared",
     ], absent = [
-        "build/outputs/apk/debug/jni-android-debug.apk!lib/x86_64/libgreeter.so",
+        "build/outputs/apk/debug/jni-android-debug.apk!lib/x86/libgreeter.so",
         "build/outputs/apk/debug/jni-android-debug.apk!lib/armeabi-v7a/libgreeter.so",
         "greeter/build/lib",
         "shout/build/lib",

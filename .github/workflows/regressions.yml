@@ -128,14 +128,14 @@ jobs:
           ref: ${{ env.BUILD_SCRIPT_REF }}
           path: build-script
 
-      # it boots while build-script compiles
+      # it boots while build-script compiles, with the NDK of the apps with libraries of C and C++
       - name: Emulator
         run: |
           image="system-images;android-34;google_apis;x86_64"
           # avdmanager takes the home of Java, the emulator HOME: both look here instead
           export ANDROID_AVD_HOME="$RUNNER_TEMP/avd"
           mkdir -p "$ANDROID_AVD_HOME"
-          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" emulator "$image" > /dev/null
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" emulator "$image" "ndk;28.2.13676358" > /dev/null
           echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --name regressions --package "$image" --device pixel_6
           "$ANDROID_HOME/emulator/emulator" -list-avds | grep -qx regressions
           nohup "$ANDROID_HOME/emulator/emulator" -avd regressions -port 5580 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect > emulator.log 2>&1 &
