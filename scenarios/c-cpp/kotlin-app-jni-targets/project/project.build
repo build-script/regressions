@@ -1,0 +1,20 @@
+use cpp
+use kotlin
+
+repositories = list(maven_central())
+
+// the jar packs it for every target it names, run and test load the one of this machine
+greeter = build_cpp(
+    "greeter", list(), shared = true, jni = true, directory = "greeter",
+    targets = list(host_target(), "linux-aarch64", "windows-x86_64"),
+)
+
+build_kotlin(
+    "app",
+    list(greeter),
+    repositories,
+    main_class = "com.example.MainKt",
+    directory = "app",
+    fat_jar = true,
+    test_dependencies = list("org.jetbrains.kotlin:kotlin-test"),
+)

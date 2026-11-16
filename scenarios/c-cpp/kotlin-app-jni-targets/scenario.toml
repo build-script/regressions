@@ -1,0 +1,17 @@
+# a JNI library for three targets in the jar and the fat jar of a Kotlin app, run and its tests load the one of this machine
+steps = [
+    { command = "build", binaries = [
+        "app/build/libs/app.jar!META-INF/native/linux-aarch64/libgreeter.so = elf-aarch64-shared",
+        "app/build/libs/app.jar!META-INF/native/windows-x86_64/greeter.dll = pe-x86_64-dll",
+        "app/build/libs/app-all.jar!META-INF/native/linux-aarch64/libgreeter.so = elf-aarch64-shared",
+        "app/build/libs/app-all.jar!META-INF/native/windows-x86_64/greeter.dll = pe-x86_64-dll",
+    ] },
+    { command = "build again", platforms = ["macos"], binaries = [
+        "app/build/libs/app.jar!META-INF/native/macos-aarch64/libgreeter.dylib = macho-aarch64-dylib",
+    ] },
+    { command = "build again", platforms = ["linux"], binaries = [
+        "app/build/libs/app.jar!META-INF/native/linux-x86_64/libgreeter.so = elf-x86_64-shared",
+    ] },
+    "test",
+    { command = "run", output = "Hello, Kotlin, from C++" },
+]
