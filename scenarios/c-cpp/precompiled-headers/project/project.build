@@ -1,0 +1,10 @@
+use cpp
+
+// headers every source needs, translated once before them: the sources do not include them themselves
+headers = list("<string>", "<vector>", "src/common.hpp")
+
+app = build_cpp("app", list(), program = true, precompiled_headers = headers)
+
+// zig, for this machine and for another target, with the same sources
+build_cpp("zig-app", list(), program = true, toolchain = "zig", precompiled_headers = headers, test_sources = list())
+build_cpp("cross-app", list(), program = true, precompiled_headers = headers, test_sources = list(), targets = list("linux-aarch64"))

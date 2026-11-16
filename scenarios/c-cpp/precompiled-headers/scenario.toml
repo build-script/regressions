@@ -1,0 +1,14 @@
+# precompiled headers with the compilers of the system, with zig and for another target: sources and tests take them, a changed header compiles the sources again
+steps = [
+    { command = "build", output = "Precompiling 3 header(s)", files = [
+        "build/obj/zig-app/debug/pch/clang/pch.hpp.pch",
+        "build/linux-aarch64/obj/cross-app/debug/pch/clang/pch.hpp.pch",
+    ], binaries = ["build/linux-aarch64/bin/cross-app = elf-aarch64"] },
+    { command = "build again", platforms = ["macos", "windows"], files = ["build/obj/app/debug/pch/clang/pch.hpp.pch"] },
+    { command = "build again", platforms = ["linux"], files = ["build/obj/app/debug/pch/gcc/pch.hpp.gch"] },
+    { command = "build", changed = "src/common.hpp", output = "Precompiling 3 header(s)" },
+    "build again",
+    { command = "test", output = "Precompiling 3 header(s) of the tests" },
+    { command = "run --module app", output = "hello from the precompiled headers" },
+    { command = "run --module zig-app", output = "hello from the precompiled headers" },
+]
