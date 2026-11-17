@@ -1,0 +1,11 @@
+# a JNI library with a port of vcpkg for two ABIs: the NDK builds the port for each, at the min_sdk of the app
+steps = [
+    { command = "build", binaries = [
+        "build/outputs/apk/debug/jni-ports-debug.apk!lib/arm64-v8a/libgreeter.so = elf-aarch64-shared",
+        "build/outputs/apk/debug/jni-ports-debug.apk!lib/x86_64/libgreeter.so = elf-x86_64-shared",
+    ], files = [
+        "greeter/build/android-aarch64/vcpkg/ndk-android-aarch64-24/installed/ndk-android-aarch64-24/lib/libfmt.a",
+    ], absent = ["greeter/build/lib", "greeter/build/vcpkg"] },
+    "build again",
+    { command = "run --module jni-ports", started = "com.example.jni" },
+]

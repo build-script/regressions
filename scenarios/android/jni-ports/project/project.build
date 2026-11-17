@@ -1,0 +1,25 @@
+use android
+use cpp
+
+repositories = list(google(), maven_central())
+
+// a port of vcpkg, built by the NDK for each ABI at the min_sdk of the app
+greeter = build_cpp(
+    "greeter", list("fmt"), shared = true, jni = true, directory = "greeter",
+    targets = list("android-aarch64", "android-x86_64"),
+)
+
+jni_ports = build_android(
+    "jni-ports",
+    "com.example.jni",
+    list(
+        greeter,
+        platform("androidx.compose:compose-bom:2026.09.00"),
+        "androidx.activity:activity-compose:1.13.0",
+        "androidx.compose.material3:material3",
+        "androidx.compose.ui:ui",
+    ),
+    repositories,
+    plugins = list("compose"),
+    targets = list("android-aarch64", "android-x86_64"),
+)
