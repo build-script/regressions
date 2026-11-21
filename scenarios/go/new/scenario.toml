@@ -1,10 +1,10 @@
-# new and add with the template of the official Go plugin: a project, and a workspace with a module
+# build new go and build add go with the templates of the official plugin: no go.mod, build-script writes src/go.mod
 steps = [
-    "new go hello",
-    { command = "run hello/project.build", output = "Hello from hello" },
+    { command = "new go hello", absent = ["hello/go.mod", "hello/src/go.mod"], files = ["hello/.gitignore"] },
+    { command = "run hello/project.build", output = "Hello from hello", files = ["hello/src/go.mod"] },
     "test hello/project.build",
     "new workspace tools",
     "add go api tools/project.build",
-    { command = "run tools/project.build", output = "Hello from api" },
+    { command = "run tools/project.build", output = "Hello from api", files = ["tools/api/src/go.mod"] },
     "build again tools/project.build",
 ]

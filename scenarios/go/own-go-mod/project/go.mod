@@ -1,4 +1,4 @@
-module example.com/hello
+module example.com/own
 
 go 1.27
 

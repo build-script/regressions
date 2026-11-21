@@ -1,5 +1,6 @@
 use go
 
-// a server for Linux on arm64 and a tool for Windows, on every machine
-build_go("server", goos = "linux", goarch = "arm64")
-build_go("tool", goos = "windows", goarch = "amd64")
+// a server for Linux on arm64 and a tool for Windows, on every machine: two programs of one module
+cross = go_module("cross")
+build_go("server", module = cross, goos = "linux", goarch = "arm64")
+build_go("tool", module = cross, goos = "windows", goarch = "amd64")

@@ -1,0 +1,13 @@
+# The libraries of a Go program in the script: build install adds them, go.mod is written from them
+steps = [
+    # main.go imports uuid, which the script does not list yet
+    { command = "build", fails = true, output = "uses github.com/google/uuid@v", absent = ["build/commands/hello/hello"] },
+    { command = "install github.com/google/uuid", output = "Added github.com/google/uuid@v" },
+    { command = "install golang.org/x/text@v0.24", output = "Added golang.org/x/text@v0.24.0 to the libraries of hello" },
+    { command = "install golang.org/x/text@v0.25.0", output = "Replaced golang.org/x/text@v0.24.0 by golang.org/x/text@v0.25.0" },
+    { command = "build", output = "lists golang.org/x/text@v0.25.0, which it does not use", files = ["src/go.mod", "src/go.sum"] },
+    "build again",
+    { command = "run", output = "Hello with cobra and a UUID of version 5" },
+    "test",
+    { command = "install github.com/google/uuid --test", fails = true, output = "build_go of hello takes no test_libraries" },
+]
