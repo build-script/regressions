@@ -1,0 +1,22 @@
+use cpp
+
+// C++26 reflection, so far only in GCC: the names of an enum without a list of them
+names = build_cpp(
+    "names",
+    list("fmt"),
+    directory = "names",
+    toolchain = "gcc",
+    cpp_standard = "c++26",
+    flags = list("-freflection"),
+    test_dependencies = list("doctest"),
+)
+
+build_cpp(
+    "colors",
+    list(names),
+    program = true,
+    directory = "colors",
+    toolchain = "gcc",
+    cpp_standard = "c++26",
+    flags = list("-freflection"),
+)

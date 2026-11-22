@@ -1,0 +1,5 @@
+# a C++ library of zig, which has libc++, cannot link into a program of GCC, which has libstdc++: the build says so
+steps = [
+    { command = "build", platforms = ["macos", "linux"], fails = true, output = "app is built for libstdc++, its library greeter for libc++: C++ libraries link with one standard library, give both the same toolchain" },
+    { command = "build", platforms = ["windows"], fails = true, output = "app is built for MinGW and libstdc++, its library greeter for MinGW and libc++: C++ libraries link with one standard library" },
+]

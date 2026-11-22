@@ -1,0 +1,4 @@
+use cpp
+
+greeter = build_cpp("greeter", list(), directory = "greeter", toolchain = "zig")
+build_cpp("app", list(greeter), program = true, directory = "app", toolchain = "gcc")
