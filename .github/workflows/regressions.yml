@@ -93,10 +93,11 @@ jobs:
           path: .logs
           include-hidden-files: true
 
-      # what vcpkg built the ports in stays out, its binary cache is in .home/caches
+      # what vcpkg built the ports in stays out, its binary cache is in .home/caches. The GCC of conda-forge
+      # downloads in seconds, faster than the cache brings it back.
       - name: Clean up
         if: always()
-        run: rm -rf .work .home/vcpkg/*/buildtrees .home/vcpkg/*/packages .home/vcpkg/*/downloads
+        run: rm -rf .work .home/gcc .home/vcpkg/*/buildtrees .home/vcpkg/*/packages .home/vcpkg/*/downloads
 
       - uses: actions/cache/save@v4
         if: always()
@@ -244,10 +245,11 @@ jobs:
           path: .logs
           include-hidden-files: true
 
+      # the GCC of conda-forge downloads in seconds, faster than the cache brings it back
       - name: Clean up
         if: always()
         shell: bash
-        run: rm -rf .work
+        run: rm -rf .work .home/gcc
 
       - uses: actions/cache/save@v4
         if: always()
