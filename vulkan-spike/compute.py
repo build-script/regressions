@@ -158,6 +158,12 @@ def main():
         run("sdk-bin-in-path", [program], sdk_path)
         run("sdk-bin-in-path-debug", [program], {**sdk_path, **debug})
         run("layers-misuse", [program, "--misuse"], {**sdk_path, **layers})
+        # does the loader ignore the layer variables in an elevated process?
+        run("whoami-groups", ["whoami", "/groups"])
+        run("layers-misuse-loader-debug", [program, "--misuse"], {**sdk_path, **layers, "VK_LOADER_DEBUG": "all"})
+        run("layer-path-loader-debug", [program, "--misuse"],
+            {**sdk_path, "VK_LAYER_PATH": sdk["explicit_layer_d"] or "",
+             "VK_INSTANCE_LAYERS": "VK_LAYER_KHRONOS_validation", "VK_LOADER_DEBUG": "all"})
         # the loader of the SDK next to the program: what build-script would do with a dll of a port
         dlls = glob.glob(os.path.join(sdk["bin"], "vulkan-1.dll"))
         if dlls:
