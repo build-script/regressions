@@ -1,0 +1,9 @@
+use c
+use cpp
+use go
+
+greet = build_c("greet", list(), directory = "greet")
+// of C++, its runtime links with it
+shout = build_cpp("shout", list(), directory = "shout")
+
+build_go("app", directory = "app", dependencies = list(greet, shout), targets = list(host_target(), "linux-aarch64"))

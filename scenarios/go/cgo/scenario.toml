@@ -1,0 +1,14 @@
+# Go with libraries of C and C++ of the script: build_go(dependencies = ...) takes their headers and libraries without #cgo lines, a header alone builds the cgo package again, zig builds both for linux-aarch64
+platforms = ["macos", "linux"]
+steps = [
+    { command = "build", binaries = ["app/build/linux-aarch64/commands/app/app = elf-aarch64-dynamic"] },
+    "build again",
+    { command = "run", output = "HELLO FROM C (2 times)" },
+    { command = "run", replaced = ["greet/src/greet.c", "hello from C", "hi from C"], output = "HI FROM C (2 times)" },
+    # only the header: the cache of Go knows no headers outside its packages
+    { command = "run", replaced = ["greet/include/greet.h", "GREET_TIMES 2", "GREET_TIMES 3"], output = "HI FROM C (3 times)" },
+    # run built for this machine alone, linux-aarch64 takes both changes now
+    { command = "build", binaries = ["app/build/linux-aarch64/commands/app/app = elf-aarch64-dynamic"] },
+    "build again",
+    "test",
+]

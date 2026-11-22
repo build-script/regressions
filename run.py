@@ -130,6 +130,9 @@ def step_of(entry):
         "release_key": entry.get("release_key"),
         # a file below the project this step changes first, the step has to build again
         "changed": entry.get("changed"),
+        # [<file>, <old>, <new>]: text of a file below the project this step replaces first, like a value the
+        # program prints, the step has to build again
+        "replaced": entry.get("replaced"),
         # the application id of an app this step starts on the device, without --device it is left out
         "started": entry.get("started"),
         "platforms": entry.get("platforms", ["macos", "linux", "windows"]),
@@ -221,6 +224,8 @@ def problem_of(step, code, output, work):
             return f"{file} should not be there"
     if step["changed"] and not WORK_DONE.search(output):
         return f"not built again after {step['changed']} changed"
+    if step["replaced"] and not WORK_DONE.search(output):
+        return f"not built again after {step['replaced'][0]} changed"
     if step["again"] and ("Up to date" not in output or WORK_DONE.search(output)):
         return "not up to date"
     if step["arguments"][0] == "test" and not step["fails"] and "> Tests" not in output:
@@ -318,6 +323,15 @@ def run(scenario, build, logs, device):
             # one more line at the end changes the content, but not what it means
             with open(work / step["changed"], "a") as changed_file:
                 changed_file.write("\n")
+
+        if step["replaced"]:
+            file, old, new = step["replaced"]
+            data = (work / file).read_bytes()
+            if old.encode() not in data:
+                failures += 1
+                print(f"  FAIL  {step['label']}: no \"{old}\" in {file} to replace")
+                break
+            (work / file).write_bytes(data.replace(old.encode(), new.encode()))
 
         if step["release_key"]:
             create_release_key(work / step["release_key"], environment)
