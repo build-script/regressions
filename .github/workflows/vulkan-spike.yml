@@ -1,0 +1,45 @@
+# Throwaway spike for Vulkan in build-script, never for main: S1 installs the LunarG SDK silently
+# and measures it, S2 builds and runs a headless compute program against it.
+name: vulkan-spike
+
+on:
+  push:
+    branches: [spike/vulkan]
+
+env:
+  SDK_VERSION: 1.4.363.1
+
+jobs:
+  spike:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            platform: linux
+            python: python3
+          - os: windows-2025
+            platform: windows
+            python: python
+          - os: macos-15
+            platform: mac
+            python: python3
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: S1 install the SDK
+        run: ${{ matrix.python }} vulkan-spike/sdk.py ${{ matrix.platform }} "${{ runner.temp }}/vulkan" "${{ github.workspace }}/out"
+
+      - name: S2 compute program
+        run: ${{ matrix.python }} vulkan-spike/compute.py ${{ matrix.platform }} "${{ github.workspace }}/out"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vulkan-spike-${{ matrix.platform }}
+          path: |
+            out/*.txt
+            out/*.json
+            out/build/*.h
