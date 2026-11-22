@@ -101,7 +101,7 @@ def main():
     else:
         compiler = "g++" if platform == "linux" else "clang++"
         run("compile", [compiler, "-std=c++17", "-O1", "-Wall", "-I", build, "-I", sdk["include"], source,
-                        "-L", sdk["lib"], "-lvulkan", f"-Wl,-rpath,{sdk['lib']}", "-o", program])
+                        "-L", sdk["loader_lib"], "-lvulkan", f"-Wl,-rpath,{sdk['loader_lib']}", "-o", program])
         run("dependents", ["ldd", program] if platform == "linux" else ["otool", "-L", "-l", program])
     if not os.path.exists(program):
         report("no program, stopping")
@@ -125,7 +125,9 @@ def main():
         run("lavapipe", [program], lavapipe)
         run("lavapipe-layers-misuse", [program, "--misuse"], {**lavapipe, **layers})
         run("lavapipe-layers-clean", [program], {**lavapipe, **layers})
-        run("vulkaninfo", [os.path.join(sdk["bin"], "vulkaninfo"), "--summary"], {**lavapipe, "LD_LIBRARY_PATH": sdk["lib"]})
+        run("vulkaninfo", [os.path.join(sdk["bin"], "vulkaninfo"), "--summary"], lavapipe)
+        run("vulkaninfo-loader-path", [os.path.join(sdk["bin"], "vulkaninfo"), "--summary"],
+            {**lavapipe, "LD_LIBRARY_PATH": sdk["loader_lib"]})
     elif platform == "mac":
         run("no-driver", [program])
         run("no-driver-loader-debug", [program], debug)
@@ -140,8 +142,9 @@ def main():
         run("moltenvk-layers-misuse", [program, "--misuse"], {**moltenvk, **layers})
         run("moltenvk-layers-clean", [program], {**moltenvk, **layers})
         vulkaninfo = os.path.join(sdk["bin"], "vulkaninfo")
-        run("vulkaninfo-moltenvk", [vulkaninfo, "--summary"], moltenvk)
-        run("vulkaninfo-kosmickrisp", [vulkaninfo, "--summary"], kosmickrisp)
+        run("vulkaninfo-moltenvk", [vulkaninfo, "--summary"], {**moltenvk, "DYLD_LIBRARY_PATH": sdk["loader_lib"]})
+        run("vulkaninfo-kosmickrisp", [vulkaninfo, "--summary"],
+            {**kosmickrisp, "DYLD_LIBRARY_PATH": sdk["loader_lib"]})
         run("sw_vers", ["sw_vers"])
         run("system_profiler", ["system_profiler", "SPDisplaysDataType"])
     else:
@@ -160,7 +163,7 @@ def main():
         if dlls:
             shutil.copy(dlls[0], build)
             run("dll-next-to-program-debug", [program], debug)
-        run("vulkaninfo", [os.path.join(sdk["bin"], "vulkaninfo" + exe), "--summary"], sdk_path)
+        run("vulkaninfo", [os.path.join(sdk["bin"], "vulkaninfoSDK.exe"), "--summary"], sdk_path)
 
     with open(os.path.join(out, "s2-report.txt"), "w", encoding="utf-8") as f:
         f.write("\n".join(report_lines))

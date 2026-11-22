@@ -2,7 +2,9 @@
 silently into a directory of our own, and record size, time, layout, licenses and whatever the
 installer writes outside that directory.
 
-usage: sdk.py <linux|mac|windows> <work dir> <out dir>
+usage: sdk.py <linux|mac|windows> <work dir> <out dir> [extras]
+  extras (windows): the default install and the copy-only install without admin rights,
+  run after S2 because the default install puts a loader into System32
 """
 
 import fnmatch
@@ -20,6 +22,7 @@ VERSION = os.environ.get("SDK_VERSION", "1.4.363.1")
 FILES = {"linux": "vulkan_sdk.tar.xz", "mac": "vulkan_sdk.zip", "windows": "vulkan_sdk.exe"}
 
 platform, work, out = sys.argv[1], os.path.abspath(sys.argv[2]), os.path.abspath(sys.argv[3])
+extras = len(sys.argv) > 4 and sys.argv[4] == "extras"
 os.makedirs(work, exist_ok=True)
 os.makedirs(out, exist_ok=True)
 report_lines = []
@@ -184,7 +187,12 @@ def install(archive, root, label, extra=(), as_basic_user=False):
         marker = os.path.join(work, f"install-{label}.done")
         quoted = " ".join(f'"{a}"' for a in args)
         with open(script, "w") as f:
-            f.write(f"@echo off\r\n{quoted} > \"{log}\" 2>&1\r\necho %ERRORLEVEL% > \"{marker}\"\r\n")
+            f.write(f"@echo off\r\n"
+                    f"whoami /groups > \"{log}.token\" 2>&1\r\n"
+                    f"net session >> \"{log}.token\" 2>&1\r\n"
+                    f"echo net session exit %ERRORLEVEL% >> \"{log}.token\"\r\n"
+                    f"{quoted} > \"{log}\" 2>&1\r\n"
+                    f"echo %ERRORLEVEL% > \"{marker}\"\r\n")
         start = time.monotonic()
         done = subprocess.run(["runas", "/trustlevel:0x20000", script], stdout=subprocess.PIPE,
                               stderr=subprocess.STDOUT, timeout=60)
@@ -197,6 +205,10 @@ def install(archive, root, label, extra=(), as_basic_user=False):
             return None
         code = open(marker).read().strip()
         report(f"install {label}: exit {code}, {seconds:.1f} s")
+        token = open(log + ".token", encoding="utf-8", errors="replace").read()
+        report("  token of the basic user:", [l.strip() for l in token.splitlines()
+                                              if "Mandatory" in l or "Administrators" in l or "net session" in l
+                                              or "Access is denied" in l])
         return seconds if code == "0" else None
 
     code, seconds, output = run(args, f"install-{label}.txt", timeout=1800)
@@ -259,6 +271,16 @@ def find_sdk_dir(root):
     return None
 
 
+def largest(root, n=15):
+    sizes = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        for name in filenames:
+            path = os.path.join(dirpath, name)
+            if not os.path.islink(path):
+                sizes.append((os.path.getsize(path), os.path.relpath(path, root)))
+    return sorted(sizes, reverse=True)[:n]
+
+
 def first(root, *names):
     for dirpath, dirnames, filenames in os.walk(root):
         for name in filenames:
@@ -268,7 +290,13 @@ def first(root, *names):
 
 
 def main():
+    if extras:
+        windows_extras()
+        return
     report(f"platform {platform}, SDK {VERSION}, python {sys.version.split()[0]}")
+    if platform == "windows":
+        system32 = os.path.join(os.environ.get("SystemRoot", r"C:\Windows"), "System32")
+        report("System32 vulkan-1.dll before any install:", os.path.exists(os.path.join(system32, "vulkan-1.dll")))
     latest = json.loads(fetch("https://vulkan.lunarg.com/sdk/latest.json"))
     report("latest.json:", json.dumps(latest))
     sha_json = json.loads(fetch(f"https://sdk.lunarg.com/sdk/sha/{VERSION}/{platform}/{FILES[platform]}.json"))
@@ -313,6 +341,8 @@ def main():
     report(f"changed outside the root during the copy-only install: {len(outside)} paths (outside-copy-only.txt)")
     for path in outside[:40]:
         report("  ", path)
+        if "DiagnosticReports" in path and os.path.isfile(path):
+            shutil.copy(path, os.path.join(out, "diagnostic-" + os.path.basename(path) + ".txt"))
     if platform == "windows":
         registry_after = windows_registry()
         added = [l for l in registry_after if l not in registry_before]
@@ -354,17 +384,38 @@ def main():
             report("    " + "\n    ".join(text.strip().splitlines()[:8]))
     report("urls in license files:", sorted(urls)[:40])
 
+    report("largest files:")
+    for size, rel in largest(root):
+        report(f"   {mb(size):>10}  {rel}")
     sdk = find_sdk_dir(root)
+    if sdk:
+        for sub in ("lib", "Lib"):
+            lib = os.path.join(sdk, sub)
+            if os.path.isdir(lib):
+                report(f"{sub}/ of the sdk:", sorted(os.listdir(lib)))
+    loader = first(root, "libvulkan.so", "libvulkan.dylib", "vulkan-1.lib")
+    for rel in licenses:
+        path = os.path.join(root, rel)
+        if os.path.isfile(path):
+            shutil.copy(path, os.path.join(out, "license-" + os.path.basename(path)))
+    resources = os.path.join(root, "installerResources")
+    if os.path.isdir(resources):
+        for dirpath, dirnames, filenames in os.walk(resources):
+            for name in filenames:
+                report("installerResources file:", os.path.relpath(os.path.join(dirpath, name), root))
+                shutil.copy(os.path.join(dirpath, name), os.path.join(out, "installerResources-" + name))
     info = {
         "root": root,
         "vulkan_sdk": sdk,
         "bin": os.path.join(sdk, "Bin" if platform == "windows" else "bin") if sdk else None,
         "lib": os.path.join(sdk, "Lib" if platform == "windows" else "lib") if sdk else None,
         "include": os.path.join(sdk, "Include" if platform == "windows" else "include") if sdk else None,
+        "loader_lib": os.path.dirname(loader) if loader else None,
         "explicit_layer_d": next((os.path.join(root, d) for d in layer_dirs if d.endswith("explicit_layer.d")
                                   and "iOS" not in d), None),
         "moltenvk_icd": first(os.path.join(root, "macOS"), "MoltenVK_icd.json") if platform == "mac" else None,
         "kosmickrisp_icd": first(os.path.join(root, "macOS"), "libkosmickrisp_icd.json") if platform == "mac" else None,
+        "archive": sha_json["file"],
         "install_seconds": seconds,
         "download_seconds": download_seconds,
         "archive_bytes": archive_size,
@@ -378,33 +429,36 @@ def main():
     report("sdk.json:", json.dumps(info, indent=2))
     save("sdk.json", json.dumps(info, indent=2))
 
-    # windows only: what the default install writes outside the root, and whether it runs without admin
-    if platform == "windows":
-        registry_before = windows_registry()
-        since = time.time() - 1
-        default_root = os.path.join(work, "sdk-default", VERSION)
-        install(archive, default_root, "default")
-        time.sleep(1)
-        outside = newer_files(outside_roots(), since, outside_skip())
-        save("outside-default.txt", "\n".join(outside))
-        report(f"changed outside the root during the default install: {len(outside)} paths (outside-default.txt)")
-        for path in outside[:40]:
-            report("  ", path)
-        registry_after = windows_registry()
-        added = [l for l in registry_after if l not in registry_before]
-        save("registry-default.txt", "added:\n" + "\n".join(added))
-        report(f"registry during the default install: {len(added)} lines added")
-        for line in added[:60]:
-            report("  +", line)
-        basic_root = os.path.join(work, "sdk-basic-user", VERSION)
-        install(archive, basic_root, "basic-user", extra=("copy_only=1",), as_basic_user=True)
-        if os.path.isdir(basic_root):
-            size, count = tree_size(basic_root)
-            report(f"basic-user install root: {mb(size)} in {count} files")
-        else:
-            report("basic-user install root does not exist")
-
     save("s1-report.txt", "\n".join(report_lines))
+
+
+def windows_extras():
+    """What the default install writes outside the root, and whether copy-only runs without admin."""
+    archive = os.path.join(work, "downloads", json.load(open(os.path.join(out, "sdk.json")))["archive"])
+    registry_before = windows_registry()
+    since = time.time() - 1
+    default_root = os.path.join(work, "sdk-default", VERSION)
+    install(archive, default_root, "default")
+    time.sleep(1)
+    outside = newer_files(outside_roots(), since, outside_skip())
+    save("outside-default.txt", "\n".join(outside))
+    report(f"changed outside the root during the default install: {len(outside)} paths (outside-default.txt)")
+    for path in outside[:40]:
+        report("  ", path)
+    registry_after = windows_registry()
+    added = [l for l in registry_after if l not in registry_before]
+    save("registry-default.txt", "added:\n" + "\n".join(added))
+    report(f"registry during the default install: {len(added)} lines added")
+    for line in added[:60]:
+        report("  +", line)
+    basic_root = os.path.join(work, "sdk-basic-user", VERSION)
+    install(archive, basic_root, "basic-user", extra=("copy_only=1",), as_basic_user=True)
+    if os.path.isdir(basic_root):
+        size, count = tree_size(basic_root)
+        report(f"basic-user install root: {mb(size)} in {count} files")
+    else:
+        report("basic-user install root does not exist")
+    save("s1-extras-report.txt", "\n".join(report_lines))
 
 
 main()

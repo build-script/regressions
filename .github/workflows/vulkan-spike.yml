@@ -24,6 +24,10 @@ jobs:
           - os: macos-15
             platform: mac
             python: python3
+          # KosmicKrisp wants macOS 26 on Apple silicon
+          - os: macos-26
+            platform: mac
+            python: python3
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
@@ -35,11 +39,18 @@ jobs:
       - name: S2 compute program
         run: ${{ matrix.python }} vulkan-spike/compute.py ${{ matrix.platform }} "${{ github.workspace }}/out"
 
+      # after S2: the default install puts a loader into System32
+      - name: S1 default install and install without admin
+        if: runner.os == 'Windows'
+        run: ${{ matrix.python }} vulkan-spike/sdk.py ${{ matrix.platform }} "${{ runner.temp }}/vulkan" "${{ github.workspace }}/out" extras
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: vulkan-spike-${{ matrix.platform }}
+          name: vulkan-spike-${{ matrix.os }}
           path: |
             out/*.txt
             out/*.json
+            out/*.token
+            out/installerResources-*
             out/build/*.h
