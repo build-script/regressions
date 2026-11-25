@@ -51,11 +51,12 @@ jobs:
           ref: ${{ env.BUILD_SCRIPT_REF }}
           path: build-script
 
-      # raylib needs the X11 headers and autotools for its ports, tablegen-colors the LLVM of Homebrew, 23
+      # raylib needs the X11 headers and autotools for its ports, tablegen-colors the LLVM of Homebrew, 23, the
+      # vulkan scenarios lavapipe of Mesa, a Vulkan driver without a GPU
       - name: Packages
         run: |
           sudo apt-get update -q
-          sudo apt-get install -q -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev autoconf autoconf-archive automake libtool
+          sudo apt-get install -q -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev autoconf autoconf-archive automake libtool mesa-vulkan-drivers
           wget -q https://apt.llvm.org/llvm.sh
           sudo bash llvm.sh 23 > /dev/null
           sudo apt-get install -q -y llvm-23-dev
@@ -83,6 +84,10 @@ jobs:
           cargo build --release
           cargo test --release
 
+      # the SDK of LunarG for the vulkan scenarios: its parts are open source, mostly MIT or Apache 2.0
+      - name: Licenses
+        run: BUILD_SCRIPT_HOME=.home build-script/target/release/build-script config license.vulkan-sdk accepted
+
       - name: Scenarios
         run: python3 run.py --build build-script/target/release/build-script ${{ inputs.scenarios }} --kind ${{ inputs.kinds || 'general c-cpp jvm android go' }}
 
@@ -93,11 +98,11 @@ jobs:
           path: .logs
           include-hidden-files: true
 
-      # what vcpkg built the ports in stays out, its binary cache is in .home/caches. The GCC of conda-forge
-      # downloads in seconds, faster than the cache brings it back.
+      # what vcpkg built the ports in stays out, its binary cache is in .home/caches. The GCC of conda-forge and the
+      # Vulkan SDK of LunarG download in seconds, faster than the cache brings them back.
       - name: Clean up
         if: always()
-        run: rm -rf .work .home/gcc .home/vcpkg/*/buildtrees .home/vcpkg/*/packages .home/vcpkg/*/downloads
+        run: rm -rf .work .home/gcc .home/tools/vulkan-sdk .home/vcpkg/*/buildtrees .home/vcpkg/*/packages .home/vcpkg/*/downloads
 
       - uses: actions/cache/save@v4
         if: always()
@@ -235,6 +240,10 @@ jobs:
           cargo build --release
           cargo test --release
 
+      - name: Licenses
+        shell: bash
+        run: BUILD_SCRIPT_HOME=.home build-script/target/release/build-script.exe config license.vulkan-sdk accepted
+
       - name: Scenarios
         run: python run.py --build build-script/target/release/build-script.exe ${{ inputs.scenarios }} --kind ${{ inputs.kinds || 'general c-cpp jvm android go' }}
 
@@ -245,11 +254,11 @@ jobs:
           path: .logs
           include-hidden-files: true
 
-      # the GCC of conda-forge downloads in seconds, faster than the cache brings it back
+      # the GCC of conda-forge and the Vulkan SDK of LunarG download in seconds, faster than the cache brings them back
       - name: Clean up
         if: always()
         shell: bash
-        run: rm -rf .work .home/gcc
+        run: rm -rf .work .home/gcc .home/tools/vulkan-sdk
 
       - uses: actions/cache/save@v4
         if: always()
@@ -294,6 +303,9 @@ jobs:
           cargo build --release
           cargo test --release
 
+      - name: Licenses
+        run: BUILD_SCRIPT_HOME=.home build-script/target/release/build-script config license.vulkan-sdk accepted
+
       - name: Scenarios
         run: python3 run.py --build build-script/target/release/build-script ${{ inputs.scenarios }} --kind ${{ inputs.kinds }}
 
@@ -304,9 +316,10 @@ jobs:
           path: .logs
           include-hidden-files: true
 
+      # the Vulkan SDK of LunarG installs in a minute, faster than the cache brings its 2.7 GB back
       - name: Clean up
         if: always()
-        run: rm -rf .work .home/vcpkg/*/buildtrees .home/vcpkg/*/packages .home/vcpkg/*/downloads
+        run: rm -rf .work .home/tools/vulkan-sdk .home/vcpkg/*/buildtrees .home/vcpkg/*/packages .home/vcpkg/*/downloads
 
       - uses: actions/cache/save@v4
         if: always()
