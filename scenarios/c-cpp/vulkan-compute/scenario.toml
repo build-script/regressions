@@ -1,0 +1,10 @@
+# Vulkan with the official plugin: the SDK of LunarG installed by build-script, glslc translates the compute shader
+# into a header, the loader of vcpkg lies next to the program, on Linux lavapipe and on macOS MoltenVK run it. The
+# runner of Windows has no Vulkan driver: it only builds there.
+steps = [
+    "build",
+    "build again",
+    { command = "run", platforms = ["macos", "linux"], output = "doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32" },
+    { command = "build", changed = "shaders/double.comp", output = "Done: 1 of 1 input(s)" },
+    "build --release",
+]

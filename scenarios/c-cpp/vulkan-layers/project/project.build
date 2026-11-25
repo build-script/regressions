@@ -1,0 +1,4 @@
+use vulkan
+
+// a buffer that outlives its device: the validation layers of the SDK say so in debug builds
+build_vulkan("layers")
