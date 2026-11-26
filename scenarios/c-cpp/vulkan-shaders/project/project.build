@@ -1,0 +1,4 @@
+use vulkan
+
+// GLSL with glslc, HLSL with dxc and Slang with slangc, checked, reflected, as text, embedded and as files
+build_vulkan("shaders", hlsl_profile = "cs_6_0", reflect_shaders = true, disassemble_shaders = true)

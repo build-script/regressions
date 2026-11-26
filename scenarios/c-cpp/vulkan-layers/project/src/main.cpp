@@ -8,9 +8,7 @@
 #include <cstring>
 #include <vector>
 
-static const uint32_t shader[] =
-#include "double.comp.h"
-    ;
+#include "double.comp.spv.h"
 
 static const uint32_t COUNT = 16;
 
@@ -160,8 +158,8 @@ int main() {
     check(vkCreatePipelineLayout(device, &pipeline_layout_info, nullptr, &pipeline_layout), "vkCreatePipelineLayout");
 
     VkShaderModuleCreateInfo module_info{VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO};
-    module_info.codeSize = sizeof(shader);
-    module_info.pCode = shader;
+    module_info.codeSize = double_comp_spv_size;
+    module_info.pCode = double_comp_spv;
     VkShaderModule shader_module;
     check(vkCreateShaderModule(device, &module_info, nullptr, &shader_module), "vkCreateShaderModule");
 
