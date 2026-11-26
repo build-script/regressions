@@ -1,0 +1,4 @@
+use vulkan
+
+// a shared library of Vulkan for an app of Android: the headers of vcpkg, the loader of the NDK
+build_vulkan("compute", program = false, shared = true, targets = list("android-aarch64"))

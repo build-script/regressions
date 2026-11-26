@@ -1,0 +1,5 @@
+# Vulkan for Android: vcpkg has no loader for it, the library links the libvulkan.so of the NDK
+platforms = ["linux"]
+steps = [
+    { command = "build", binaries = ["build/android-aarch64/lib/libcompute.so = elf-aarch64"] },
+]
