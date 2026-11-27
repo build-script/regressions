@@ -1,0 +1,27 @@
+# Vulkan in every language: new and add of what the vulkan plugin brings to C++, C, Kotlin, Java and Go, a program that
+# computes and one that draws into a window of GLFW for each, every one with the same vulkan(). Linux draws in Xvfb
+# with lavapipe, the runner of Windows has no Vulkan driver: it only builds there.
+steps = [
+    "new cpp:vulkan gpu",
+    "add cpp:vulkan-glfw cpp-window gpu/project.build",
+    "add c:vulkan c-compute gpu/project.build",
+    "add c:vulkan-glfw c-window gpu/project.build",
+    "add kotlin:vulkan kotlin-compute gpu/project.build",
+    "add kotlin:vulkan-glfw kotlin-window gpu/project.build",
+    "add java:vulkan java-compute gpu/project.build",
+    "add java:vulkan-glfw java-window gpu/project.build",
+    "add go:vulkan go-compute gpu/project.build",
+    "add go:vulkan-glfw go-window gpu/project.build",
+    { command = "build gpu/project.build", files = ["gpu/kotlin-compute/build/libs/kotlin-compute.jar!double.comp.spv", "gpu/java-window/build/libs/java-window.jar!triangle.vert.spv"] },
+    "build again gpu/project.build",
+    { command = "run --module gpu gpu/project.build", platforms = ["macos", "linux"], output = "doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32", unwanted = "Validation Error" },
+    { command = "run --module c-compute gpu/project.build", platforms = ["macos", "linux"], output = "doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32", unwanted = "Validation Error" },
+    { command = "run --module kotlin-compute gpu/project.build", platforms = ["macos", "linux"], output = "doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32", unwanted = "Validation Error" },
+    { command = "run --module java-compute gpu/project.build", platforms = ["macos", "linux"], output = "doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32", unwanted = "Validation Error" },
+    { command = "run --module go-compute gpu/project.build", platforms = ["macos", "linux"], output = "doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32", unwanted = "Validation Error" },
+    { command = "run --module cpp-window gpu/project.build -- --frames 3", platforms = ["macos", "linux"], output = "rendered 3 frames", unwanted = "Validation Error" },
+    { command = "run --module c-window gpu/project.build -- --frames 3", platforms = ["macos", "linux"], output = "rendered 3 frames", unwanted = "Validation Error" },
+    { command = "run --module kotlin-window gpu/project.build -- --frames 3", platforms = ["macos", "linux"], output = "rendered 3 frames", unwanted = "Validation Error" },
+    { command = "run --module java-window gpu/project.build -- --frames 3", platforms = ["macos", "linux"], output = "rendered 3 frames", unwanted = "Validation Error" },
+    { command = "run --module go-window gpu/project.build -- --frames 3", platforms = ["macos", "linux"], output = "rendered 3 frames", unwanted = "Validation Error" },
+]

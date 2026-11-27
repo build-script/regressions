@@ -1,0 +1,7 @@
+use go
+use vulkan
+
+// Go with Vulkan for linux-aarch64: vcpkg builds the headers and the loader of vulkan() with zig for it, cgo compiles
+// go-vk with the same zig. The loader leaves out the surfaces of X11, whose headers this machine has only for itself.
+arm_shaders = build_shaders("arm-shaders", list("shaders/*.comp"), embed = false)
+build_go("arm", dependencies = list(vulkan(window = false)) + arm_shaders, targets = list("linux-aarch64"))

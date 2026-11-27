@@ -1,0 +1,7 @@
+# the bundle of vulkan() for Go on another target: the ports go into a library of C for linux-aarch64, its zig compiles
+# the cgo of go-vk, the library of Go comes with the bundle
+platforms = ["macos", "linux"]
+steps = [
+    { command = "build", binaries = ["build/linux-aarch64/commands/arm/arm = elf-aarch64-dynamic"] },
+    "build again",
+]
