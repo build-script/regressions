@@ -52,11 +52,11 @@ jobs:
           path: build-script
 
       # raylib needs the X11 headers and autotools for its ports, tablegen-colors the LLVM of Homebrew, 23, the
-      # vulkan scenarios lavapipe of Mesa, a Vulkan driver without a GPU
+      # vulkan scenarios lavapipe of Mesa, a Vulkan driver without a GPU, and Xvfb, a display for their windows
       - name: Packages
         run: |
           sudo apt-get update -q
-          sudo apt-get install -q -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev autoconf autoconf-archive automake libtool mesa-vulkan-drivers
+          sudo apt-get install -q -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev autoconf autoconf-archive automake libtool mesa-vulkan-drivers xvfb
           wget -q https://apt.llvm.org/llvm.sh
           sudo bash llvm.sh 23 > /dev/null
           sudo apt-get install -q -y llvm-23-dev
@@ -89,7 +89,7 @@ jobs:
         run: BUILD_SCRIPT_HOME=.home build-script/target/release/build-script config license.vulkan-sdk accepted
 
       - name: Scenarios
-        run: python3 run.py --build build-script/target/release/build-script ${{ inputs.scenarios }} --kind ${{ inputs.kinds || 'general c-cpp jvm android go' }}
+        run: xvfb-run -a --server-args="-screen 0 1280x720x24" python3 run.py --build build-script/target/release/build-script ${{ inputs.scenarios }} --kind ${{ inputs.kinds || 'general c-cpp jvm android go' }}
 
       - uses: actions/upload-artifact@v4
         if: failure()

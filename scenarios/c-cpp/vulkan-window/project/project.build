@@ -1,0 +1,4 @@
+use vulkan
+
+// build_vulkan with GLFW of vcpkg: a triangle in a window, on Linux in Xvfb with lavapipe
+build_vulkan("triangle", dependencies = list("glfw3"))

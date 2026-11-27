@@ -1,0 +1,7 @@
+# a triangle in a window: GLFW from vcpkg, a swapchain, dynamic rendering of Vulkan 1.3, the validation layers watching.
+# Linux draws in Xvfb with lavapipe, the runner of Windows has no Vulkan driver: it only builds there.
+steps = [
+    "build",
+    "build again",
+    { command = "run -- --frames 3", platforms = ["macos", "linux"], output = "rendered 3 frames", unwanted = "Validation Error" },
+]
