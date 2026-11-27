@@ -9,9 +9,9 @@ steps = [
         "build/shaders/shaders-shaders/double.slang.spvasm",
     ] },
     "build again",
-    { command = "run -- glsl", platforms = ["macos", "linux"], output = "glsl doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32" },
-    { command = "run -- hlsl", platforms = ["macos", "linux"], output = "hlsl doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32" },
-    { command = "run -- slang", platforms = ["macos", "linux"], output = "slang doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32" },
-    { command = "run -- file", platforms = ["macos", "linux"], output = "file doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32" },
+    { command = "run -- glsl", platforms = ["macos", "linux"], output = "glsl doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32", unwanted = "Validation Error" },
+    { command = "run -- hlsl", platforms = ["macos", "linux"], output = "hlsl doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32", unwanted = "Validation Error" },
+    { command = "run -- slang", platforms = ["macos", "linux"], output = "slang doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32", unwanted = "Validation Error" },
+    { command = "run -- file", platforms = ["macos", "linux"], output = "file doubled: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32", unwanted = "Validation Error" },
     { command = "build --release", files = ["build/shaders/shaders-shaders/double.hlsl.spv"] },
 ]

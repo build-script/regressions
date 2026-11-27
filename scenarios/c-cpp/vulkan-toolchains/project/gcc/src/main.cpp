@@ -37,7 +37,7 @@ int main() {
 
     VkApplicationInfo application{VK_STRUCTURE_TYPE_APPLICATION_INFO};
     application.pApplicationName = "gcc";
-    application.apiVersion = VK_API_VERSION_1_1;
+    application.apiVersion = VK_API_VERSION_1_3;
 
     const char* portability = VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME;
     VkInstanceCreateInfo instance_info{VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};

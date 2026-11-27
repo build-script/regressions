@@ -117,6 +117,8 @@ def step_of(entry):
         "again": again,
         "fails": entry.get("fails", False),
         "output": entry.get("output"),
+        # text the output must not have, like the errors the validation layers of Vulkan print
+        "unwanted": entry.get("unwanted"),
         # lines with it are no linkage errors, like a warning of the project itself
         "harmless": entry.get("harmless"),
         # files below the project this step has to leave behind, `<archive>!<entry>` names one in an apk or jar
@@ -213,6 +215,8 @@ def problem_of(step, code, output, work):
         return f"exit {code}"
     if step["output"] and step["output"] not in output:
         return f"no \"{step['output']}\" in the output"
+    if step["unwanted"] and step["unwanted"] in output:
+        return f"\"{step['unwanted']}\" in the output"
     for file in step["files"]:
         if contents(work, file) is None:
             return f"no {file}"

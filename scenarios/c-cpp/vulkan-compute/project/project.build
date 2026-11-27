@@ -1,4 +1,4 @@
 use vulkan
 
-// the template app of the vulkan plugin: a compute shader doubles numbers, on Linux with lavapipe of Mesa
+// build_vulkan, the C++ of the vulkan plugin in one call: a compute shader doubles numbers, on Linux with lavapipe
 build_vulkan("compute")
