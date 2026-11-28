@@ -1,4 +1,4 @@
-# C++26 reflection with the GCC build-script keeps: a library with doctest tests and fmt of vcpkg, built by that
+# C++26 reflection with the GCC xkit keeps: a library with doctest tests and fmt of vcpkg, built by that
 # GCC too, and a program printing the names of an enum, linked without the runtime of that GCC
 steps = [
     "build",

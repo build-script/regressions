@@ -4,7 +4,7 @@ steps = [
     { command = "test --target macos-x86_64", output = "tests on x86_64", platforms = ["macos"] },
     { command = "run --target linux-x86_64-musl", output = "hello from x86_64", platforms = ["linux"] },
     { command = "test --target linux-x86_64-musl", output = "tests on x86_64", platforms = ["linux"] },
-    { command = "run --target linux-aarch64", fails = true, output = "a runner starts them: build config runner.linux-aarch64 <command>", platforms = ["macos", "windows"] },
+    { command = "run --target linux-aarch64", fails = true, output = "a runner starts them: xkit config runner.linux-aarch64 <command>", platforms = ["macos", "windows"] },
     { command = "config runner.linux-aarch64 'echo runner for'", platforms = ["macos", "linux"] },
     { command = "config runner.linux-aarch64 'cmd /c echo runner for'", platforms = ["windows"] },
     { command = "run --target linux-aarch64 -- one", output = "runner for" },

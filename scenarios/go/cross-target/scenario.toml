@@ -1,4 +1,4 @@
-# one Go program for this machine and three other targets, each into build/<target>/, then once more for a target build --target names
+# one Go program for this machine and three other targets, each into build/<target>/, then once more for a target xkit --target names
 steps = [
     { command = "build", binaries = [
         "build/linux-aarch64/commands/server/server = elf-aarch64-static",

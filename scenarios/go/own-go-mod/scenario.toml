@@ -1,4 +1,4 @@
 # A go.mod of its own next to project.build, like that of a Go project brought along: the build says where its libraries go
 steps = [
-    { command = "build", fails = true, output = "go.mod is not used, build-script writes src/go.mod of the libraries of own: its require lines go into libraries" },
+    { command = "build", fails = true, output = "go.mod is not used, xkit writes src/go.mod of the libraries of own: its require lines go into libraries" },
 ]

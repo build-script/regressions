@@ -1,4 +1,4 @@
-# the validation layers of the SDK of LunarG in debug builds: build run starts the program with VK_ADD_LAYER_PATH and
+# the validation layers of the SDK of LunarG in debug builds: xkit run starts the program with VK_ADD_LAYER_PATH and
 # VK_INSTANCE_LAYERS, the layer reports the buffer the program leaks
 platforms = ["macos", "linux"]
 steps = [

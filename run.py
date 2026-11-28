@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-# Runs the regression scenarios against a build-script binary. A scenario is a directory with a
+# Runs the regression scenarios against an xkit binary. A scenario is a directory with a
 # scenario.toml: the repository and commit of its sources, if it has any, and the commands to run.
 # The files in its project/ go on top of the sources, or are the project.
 #
-#   python3 run.py --build ../build/target/release/build-script            every scenario of this system
+#   python3 run.py --build ../build/target/release/xkit            every scenario of this system
 #   python3 run.py --build ... --kind c-cpp jvm                             the C and C++ and the JVM ones
 #   python3 run.py --build ... cJSON new-kotlin                             these
 #   python3 run.py --build ... --slow                                       with those that take hours
 #   python3 run.py --build ... --device emulator-5580                       with the steps that start apps on it
 #   python3 run.py --build ... --device emulator-5580 --device-only         only the scenarios with such steps
 #
-# BUILD_SCRIPT_HOME is .home/ unless it is set. Logs go to .logs/, the projects are built in .work/.
+# XKIT_HOME is .home/ unless it is set. Logs go to .logs/, the projects are built in .work/.
 import argparse
 import os
 import re
@@ -245,8 +245,8 @@ def create_release_key(keystore, environment):
     """A key only for this run, its password exists only in RELEASE_KEY_PASSWORD"""
     environment["RELEASE_KEY_PASSWORD"] = secrets.token_urlsafe(24)
 
-    # from the JDK build-script installed in the steps before
-    keytool = next(Path(environment["BUILD_SCRIPT_HOME"]).glob("jdks/*/**/bin/keytool*"))
+    # from the JDK xkit installed in the steps before
+    keytool = next(Path(environment["XKIT_HOME"]).glob("jdks/*/**/bin/keytool*"))
 
     subprocess.run([keytool, "-genkeypair", "-keystore", keystore, "-alias", "release", "-keyalg", "RSA", "-keysize", "2048", "-validity", "2",
                     "-dname", "CN=regressions", "-storepass:env", "RELEASE_KEY_PASSWORD", "-keypass:env", "RELEASE_KEY_PASSWORD"],
@@ -254,10 +254,10 @@ def create_release_key(keystore, environment):
 
 
 def adb_of(environment):
-    """adb like build-script finds it: of ANDROID_HOME, ANDROID_SDK_ROOT or the SDK in its home, None before
-    build-script installed it with the first app"""
+    """adb like xkit finds it: of ANDROID_HOME, ANDROID_SDK_ROOT or the SDK in its home, None before
+    xkit installed it with the first app"""
     name = "adb.exe" if SYSTEM == "windows" else "adb"
-    roots = [environment.get("ANDROID_HOME"), environment.get("ANDROID_SDK_ROOT"), Path(environment["BUILD_SCRIPT_HOME"]) / "android-sdk"]
+    roots = [environment.get("ANDROID_HOME"), environment.get("ANDROID_SDK_ROOT"), Path(environment["XKIT_HOME"]) / "android-sdk"]
     adbs = [Path(root) / "platform-tools" / name for root in roots if root]
     return next((adb for adb in adbs if adb.is_file()), None)
 
@@ -309,7 +309,7 @@ def run(scenario, build, logs, device):
     extra = [path for path in scenario.config.get("path", []) if Path(path).is_dir()]
     environment["PATH"] = os.pathsep.join([*extra, environment["PATH"]])
 
-    # build-script starts apps on it
+    # xkit starts apps on it
     if device:
         environment["ANDROID_SERIAL"] = device
 
@@ -381,9 +381,9 @@ def run(scenario, build, logs, device):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Runs the regression scenarios against a build-script binary")
+    parser = argparse.ArgumentParser(description="Runs the regression scenarios against an xkit binary")
     parser.add_argument("names", nargs="*", help="scenarios to run, all without")
-    parser.add_argument("--build", default=os.environ.get("BUILD_SCRIPT_BINARY"), help="the build-script binary")
+    parser.add_argument("--build", default=os.environ.get("XKIT_BINARY"), help="the xkit binary")
     parser.add_argument("--kind", nargs="*", default=[], help="general, c-cpp, jvm, android, go")
     parser.add_argument("--slow", action="store_true", help="also the scenarios that take hours")
     parser.add_argument("--list", action="store_true", help="only list the scenarios")
@@ -413,10 +413,10 @@ def main():
         return 0
 
     if not arguments.build:
-        parser.error("--build names the build-script binary")
+        parser.error("--build names the xkit binary")
     build = str(Path(arguments.build).resolve())
 
-    os.environ.setdefault("BUILD_SCRIPT_HOME", str(ROOT / ".home"))
+    os.environ.setdefault("XKIT_HOME", str(ROOT / ".home"))
     logs = ROOT / ".logs"
     remove_tree(logs)
     logs.mkdir()

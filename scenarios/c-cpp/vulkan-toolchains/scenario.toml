@@ -1,4 +1,4 @@
-# Vulkan with zig and the GCC of build-script for this machine and with zig for linux-aarch64: vcpkg builds the loader
+# Vulkan with zig and the GCC of xkit for this machine and with zig for linux-aarch64: vcpkg builds the loader
 # with each of them, the program runs with zig and GCC, a changed file a shader includes translates it again
 platforms = ["macos", "linux"]
 steps = [

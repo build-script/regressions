@@ -1,4 +1,4 @@
-# build new go and build add go with the templates of the official plugin: no go.mod, build-script writes src/go.mod
+# xkit new go and xkit add go with the templates of the official plugin: no go.mod, xkit writes src/go.mod
 steps = [
     { command = "new go hello", absent = ["hello/go.mod", "hello/src/go.mod"], files = ["hello/.gitignore"] },
     { command = "run hello/project.build", output = "Hello from hello", files = ["hello/src/go.mod"] },

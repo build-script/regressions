@@ -1,4 +1,4 @@
-# Vulkan with the official plugin: the SDK of LunarG installed by build-script, glslc translates the compute shader
+# Vulkan with the official plugin: the SDK of LunarG installed by xkit, glslc translates the compute shader
 # into a header, the loader of vcpkg lies next to the program, on Linux lavapipe and on macOS MoltenVK run it. The
 # runner of Windows has no Vulkan driver: it only builds there.
 steps = [

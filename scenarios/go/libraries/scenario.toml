@@ -1,4 +1,4 @@
-# The libraries of a Go program in the script: build install adds them, go.mod is written from them
+# The libraries of a Go program in the script: xkit install adds them, go.mod is written from them
 steps = [
     # main.go imports uuid, which the script does not list yet
     { command = "build", fails = true, output = "uses github.com/google/uuid@v", absent = ["build/commands/hello/hello"] },

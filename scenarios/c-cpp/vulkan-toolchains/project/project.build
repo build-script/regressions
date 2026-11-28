@@ -1,7 +1,7 @@
 use vulkan
 
-// the template with the other toolchains: zig and the GCC of build-script for this machine, zig for linux-aarch64.
-// The loader without the surfaces of X11, which the GCC of build-script and other targets have no headers of.
+// the template with the other toolchains: zig and the GCC of xkit for this machine, zig for linux-aarch64.
+// The loader without the surfaces of X11, which the GCC of xkit and other targets have no headers of.
 build_vulkan("with-zig", toolchain = "zig", window = false, directory = "zig")
 build_vulkan("with-gcc", toolchain = "gcc", window = false, directory = "gcc")
 build_vulkan("for-arm", targets = list("linux-aarch64"), window = false, directory = "arm")
